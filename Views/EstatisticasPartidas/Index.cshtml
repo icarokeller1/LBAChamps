@@ -1,0 +1,143 @@
+@model IEnumerable<LBAChamps.Models.EstatisticasPartida>
+@{
+    ViewData["Title"] = "Estatísticas";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<!-- Alerta caso TempData["Error"] esteja presente -->
+@if (TempData["Error"] is string msg)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-lg"></i> Nova Estatística
+    </a>
+</p>
+
+<form method="get" class="row row-cols-lg-auto g-2 align-items-end mb-3" id="filtroForm">
+    <div class="col">
+        <label class="form-label">Liga</label>
+        <select id="ligaFiltro" name="ligaId" class="form-select" asp-items="ViewBag.Ligas">
+            <option value="">(todas)</option>
+        </select>
+    </div>
+    <div class="col">
+        <label class="form-label">Mandante</label>
+        <select id="timeFiltro" name="timeId" class="form-select" asp-items="ViewBag.Times">
+            <option value="">(todos)</option>
+        </select>
+    </div>
+    <div class="col">
+        <label class="form-label">Jogador</label>
+        <select id="jogadorFiltro" name="jogadorId" class="form-select" asp-items="ViewBag.Jogadores">
+            <option value="">(todos)</option>
+        </select>
+    </div>
+    <div class="col">
+        <button type="submit" class="btn btn-primary">Aplicar</button>
+        <a asp-action="Index" class="btn btn-secondary ms-1">Limpar</a>
+    </div>
+</form>
+
+<table class="table table-striped align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>Partida</th>
+            <th>Jogador</th>
+            <th>Pontos</th>
+            <th>Rebotes</th>
+            <th>Assistências</th>
+            <th>Roubos</th>
+            <th>Tocos</th>
+            <th>Faltas</th>
+            <th class="text-end">Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var e in Model)
+        {
+            <tr>
+                <td>
+                    @e.Partida.TimeCasa.Nome  x  @e.Partida.TimeFora.Nome
+                    (<span class="text-muted">
+                        @e.Partida.DataHora.ToString("dd/MM")
+                    </span>)
+                </td>
+                <td>
+                    @e.Jogador.Nome
+                    <small class="text-muted">(@e.Jogador.Time.Nome)</small>
+                </td>
+                <td>@e.Pontos</td>
+                <td>@e.Rebotes</td>
+                <td>@e.Assistencias</td>
+                <td>@e.RoubosBola</td>
+                <td>@e.Tocos</td>
+                <td>@e.Faltas</td>
+                <td class="text-end">
+                    <a asp-action="Edit" asp-route-id="@e.IdEstatistica" class="btn btn-sm btn-primary">Editar</a>
+                    <a asp-action="Details" asp-route-id="@e.IdEstatistica" class="btn btn-sm btn-info ms-1">Detalhes</a>
+
+                    <!-- botão que apenas dispara o modal -->
+                    <button class="btn btn-sm btn-danger ms-1"
+                            data-bs-toggle="modal"
+                            data-bs-target="#confirmDeleteModal"
+                            data-title="Excluir Estatística"
+                            data-message="Tem certeza que deseja remover esta estatística?"
+                            data-url="@Url.Action("Delete", "EstatisticasPartidas", new { id = e.IdEstatistica })">
+                        Excluir
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Modal de confirmação -->
+@await Html.PartialAsync("_DeleteModal",
+("Excluir Registro", "Tem certeza que deseja excluir este item?", "#"))
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/delete-modal.js"></script>
+
+    <script>
+        const apiBase = '/api';
+        const ligaSel  = document.getElementById('ligaFiltro');
+        const timeSel  = document.getElementById('timeFiltro');
+        const jogSel   = document.getElementById('jogadorFiltro');
+
+        function fill(sel, items, text, value) {
+          sel.innerHTML = '<option value="">(todos)</option>';
+          items.forEach(i => sel.add(new Option(i[text], i[value])));
+          sel.value = '';               // limpa seleção anterior
+        }
+
+        ligaSel.addEventListener('change', () => {
+          fill(timeSel, [], '', ''); fill(jogSel, [], '', '');
+          const ligaId = ligaSel.value;
+          if (!ligaId) return;
+
+          fetch(`${apiBase}/times/by-liga/${ligaId}`)
+            .then(r => r.ok ? r.json() : [])
+            .then(d => fill(timeSel, d, 'Nome', 'IdTime'));
+        });
+
+        timeSel.addEventListener('change', () => {
+          fill(jogSel, [], '', '');
+          const timeId = timeSel.value;
+          if (!timeId) return;
+
+          fetch(`${apiBase}/jogadores/by-time/${timeId}`)
+            .then(r => r.ok ? r.json() : [])
+            .then(d => fill(jogSel, d, 'Nome', 'IdJogador'));
+        });
+    </script>
+}

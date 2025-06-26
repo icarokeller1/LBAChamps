@@ -1,0 +1,32 @@
+﻿@model (string Title, string Message, string FormAction)
+
+/* Modal genérico de confirmação de exclusão
+   – Title      ➜ cabeçalho do modal
+   – Message    ➜ texto exibido ao usuário
+   – FormAction ➜ URL do POST que vai realmente excluir            */
+
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">@Model.Title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <p>@Model.Message</p>
+            </div>
+
+            <div class="modal-footer">
+                <form id="deleteForm" asp-antiforgery="true" method="post" action="@Model.FormAction">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-danger">
+                        Excluir
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

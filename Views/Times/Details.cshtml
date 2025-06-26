@@ -1,0 +1,29 @@
+@model LBAChamps.Models.Time
+@{
+    ViewData["Title"] = "Detalhes do Time";
+}
+
+<h2>@ViewData["Title"]</h2>
+<hr />
+
+<dl class="row">
+    <dt class="col-sm-3">Nome</dt>
+    <dd class="col-sm-9">@Model.Nome</dd>
+
+    <dt class="col-sm-3">Cidade / UF</dt>
+    <dd class="col-sm-9">@Model.Cidade – @Model.Estado</dd>
+
+    <dt class="col-sm-3">Liga</dt>
+    <dd class="col-sm-9">@Model.Liga.Nome</dd>
+
+    <dt class="col-sm-3">Logo</dt>
+    <dd class="col-sm-9">
+        @if (Model.Logo is null)
+        { <span class="text-muted">(sem logo)</span> }
+        else
+        { <img src="~/api/times/@Model.IdTime/logo" alt="logo" style="max-height:120px"/> }
+    </dd>
+</dl>
+
+<a asp-action="Edit" asp-route-id="@Model.IdTime" class="btn btn-primary">Editar</a>
+<a asp-action="Index" class="btn btn-secondary ms-2">Voltar</a>

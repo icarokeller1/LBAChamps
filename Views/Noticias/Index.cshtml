@@ -1,0 +1,78 @@
+@model IEnumerable<LBAChamps.Models.Noticia>
+
+@{
+    ViewData["Title"] = "Notícias";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-lg"></i> Nova notícia
+    </a>
+</p>
+
+<form method="get" class="row row-cols-lg-auto g-2 align-items-end mb-3">
+    <div class="col">
+        <label class="form-label">Liga</label>
+        <select name="ligaId" class="form-select" asp-items="ViewBag.Ligas">
+            <option value="">(todas)</option>
+        </select>
+    </div>
+    <div class="col">
+        <button class="btn btn-primary">Aplicar</button>
+        <a asp-action="Index" class="btn btn-secondary ms-1">Limpar</a>
+    </div>
+</form>
+
+<table class="table table-hover align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>Título</th>
+            <th>Autor</th>
+            <th>Liga</th>
+            <th>Data</th>
+            <th class="text-end">Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Titulo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Autor)
+            </td>
+            <td>
+                @(item.Liga?.Nome ?? "-")
+            </td>
+            <td>
+                @item.DataPublicacao.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.IdNoticia" class="btn btn-sm btn-primary">Editar</a>
+                <a asp-action="Details" asp-route-id="@item.IdNoticia" class="btn btn-sm btn-info ms-1">Detalhes</a>
+                <button class="btn btn-sm btn-danger ms-1"
+                        data-bs-toggle="modal"
+                        data-bs-target="#confirmDeleteModal"
+                        data-title="Excluir notícia"
+                        data-message="Confirma excluir esta notícia?"
+                        data-url="@Url.Action("Delete", "Noticias", new { id = item.IdNoticia })">
+                    Excluir
+                </button>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+@await Html.PartialAsync("_DeleteModal",
+("Excluir", "Confirma?", "#"))
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/delete-modal.js"></script>
+}

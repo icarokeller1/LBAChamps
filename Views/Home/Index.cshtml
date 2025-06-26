@@ -1,0 +1,39 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+@{
+    var resumo = (LBAChamps.Models.ResumoLigasVM)ViewBag.ResumoLigas;
+}
+
+<div class="row g-4 mb-4 text-center">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-success">
+            <div class="card-body">
+                <i class="bi bi-play-circle fs-1 text-success"></i>
+                <h5 class="card-title mt-2">Ligas Ativas</h5>
+                <p class="display-6">@resumo.Ativas</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-info">
+            <div class="card-body">
+                <i class="bi bi-hourglass-split fs-1 text-info"></i>
+                <h5 class="card-title mt-2">Futuras</h5>
+                <p class="display-6">@resumo.Futuras</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-secondary">
+            <div class="card-body">
+                <i class="bi bi-flag fs-1 text-secondary"></i>
+                <h5 class="card-title mt-2">Finalizadas</h5>
+                <p class="display-6">@resumo.Finalizadas</p>
+            </div>
+        </div>
+    </div>
+</div>

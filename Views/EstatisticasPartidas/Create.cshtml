@@ -1,0 +1,108 @@
+@model LBAChamps.Models.EstatisticasPartida
+@{
+    ViewData["Title"] = "Nova Estatística";
+}
+
+<form asp-action="Create" class="mt-3">
+    <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+    <!-- LIGA -->
+    <div class="mb-3">
+        <label class="form-label">Liga</label>
+        <select id="ligaSelect" name="LigaId" class="form-select" asp-items="ViewBag.Ligas">
+            <option value="">Selecione…</option>
+        </select>
+    </div>
+
+    <!-- PARTIDA -->
+    <div class="mb-3">
+        <label asp-for="IdPartida" class="form-label"></label>
+        <select id="partidaSelect" asp-for="IdPartida"
+                class="form-select" asp-items="ViewBag.Partidas" disabled></select>
+        <span asp-validation-for="IdPartida" class="text-danger"></span>
+    </div>
+
+    <!-- JOGADOR -->
+    <div class="mb-3">
+        <label asp-for="IdJogador" class="form-label"></label>
+        <select id="jogadorSelect" asp-for="IdJogador"
+                class="form-select" asp-items="ViewBag.Jogadores" disabled></select>
+        <span asp-validation-for="IdJogador" class="text-danger"></span>
+    </div>
+
+    <div class="row">
+        <div class="col-4 mb-3">
+            <label asp-for="Pontos" class="form-label"></label>
+            <input asp-for="Pontos" class="form-control" />
+            <span asp-validation-for="Pontos" class="text-danger"></span>
+        </div>
+        <div class="col-4 mb-3">
+            <label asp-for="Rebotes" class="form-label"></label>
+            <input asp-for="Rebotes" class="form-control" />
+            <span asp-validation-for="Rebotes" class="text-danger"></span>
+        </div>
+        <div class="col-4 mb-3">
+            <label asp-for="Assistencias" class="form-label"></label>
+            <input asp-for="Assistencias" class="form-control" />
+            <span asp-validation-for="Assistencias" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-4 mb-3">
+            <label asp-for="RoubosBola" class="form-label"></label>
+            <input asp-for="RoubosBola" class="form-control" />
+            <span asp-validation-for="RoubosBola" class="text-danger"></span>
+        </div>
+        <div class="col-4 mb-3">
+            <label asp-for="Tocos" class="form-label"></label>
+            <input asp-for="Tocos" class="form-control" />
+            <span asp-validation-for="Tocos" class="text-danger"></span>
+        </div>
+        <div class="col-4 mb-3">
+            <label asp-for="Faltas" class="form-label"></label>
+            <input asp-for="Faltas" class="form-control" />
+            <span asp-validation-for="Faltas" class="text-danger"></span>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Salvar</button>
+    <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        const apiBase = '/api';
+
+        const ligaSel    = document.getElementById('ligaSelect');
+        const partidaSel = document.getElementById('partidaSelect');
+        const jogadorSel = document.getElementById('jogadorSelect');
+
+        function fill(sel, items, txt, val) {
+          sel.innerHTML = '<option value="">Selecione…</option>';
+          items.forEach(i => sel.add(new Option(i[txt], i[val])));
+          sel.disabled = items.length === 0;
+        }
+
+        ligaSel.addEventListener('change', () => {
+          fill(partidaSel, [], '', '');
+          fill(jogadorSel, [], '', '');
+          if (!ligaSel.value) return;
+          fetch(`${apiBase}/partidas/by-liga/${ligaSel.value}`)
+            .then(r => r.json())
+            .then(d => fill(partidaSel, d, 'descricao', 'idPartida'));
+        });
+
+        partidaSel.addEventListener('change', () => {
+          fill(jogadorSel, [], '', '');
+          if (!partidaSel.value) return;
+          fetch(`${apiBase}/jogadores/by-partida/${partidaSel.value}`)
+            .then(r => r.json())
+            .then(d => fill(jogadorSel, d, 'nome', 'idJogador'));
+        });
+    </script>
+}

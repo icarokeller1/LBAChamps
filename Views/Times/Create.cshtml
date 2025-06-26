@@ -1,0 +1,145 @@
+@model LBAChamps.ViewModels.TimeCreateViewModel
+@{
+    ViewData["Title"] = "Novo Time";
+}
+
+<form asp-action="Create" enctype="multipart/form-data" novalidate>
+    <div asp-validation-summary="All" class="alert alert-danger"></div>
+    <input type="hidden" asp-for="IdTime" />
+
+    <!-- LIGA ------------------------------------------------------------->
+    <div class="mb-3">
+        <label asp-for="IdLiga" class="form-label">Liga</label>
+        <select asp-for="IdLiga" class="form-select" asp-items="Model.Ligas">
+            <option value="">Selecione…</option>
+        </select>
+        <span asp-validation-for="IdLiga" class="text-danger"></span>
+    </div>
+
+    <!-- NOME / CIDADE / ESTADO ------------------------------------------>
+    <div class="row g-3 mb-3">
+        <div class="col-md-6">
+            <label asp-for="Nome" class="form-label"></label>
+            <input asp-for="Nome" class="form-control" placeholder="Ex.: Sharks FC">
+            <span asp-validation-for="Nome" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Cidade" class="form-label"></label>
+            <input asp-for="Cidade" class="form-control" placeholder="Cidade">
+            <span asp-validation-for="Cidade" class="text-danger"></span>
+        </div>
+        <div class="col-md-2">
+            <label asp-for="Estado" class="form-label">UF</label>
+            <input asp-for="Estado" class="form-control" maxlength="2" placeholder="SP">
+            <span asp-validation-for="Estado" class="text-danger"></span>
+        </div>
+    </div>
+
+    <!-- LOGO ------------------------------------------------------------->
+    <div class="mb-4">
+        <label class="form-label">Logo (PNG / JPEG &lt; 200 kB)</label>
+        <input type="file" name="logoFile" id="logoFile"
+               accept="image/png, image/jpeg" class="form-control">
+
+        <div class="mt-3">
+            <img id="previewImg" src="#" alt="pré-visualização" class="d-none rounded"
+                 style="max-height:120px;">
+        </div>
+    </div>
+
+    <h5>Jogadores</h5>
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Data Nasc.</th>
+                <th>Posição</th>
+                <th>Camisa</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="playersBody">
+            @* linhas iniciais, se houver (edição) *@
+            @for (int i = 0; i < Model.Players.Count; i++)
+            {
+                <tr>
+                    <td>
+                        <input asp-for="Players[@i].Nome" class="form-control form-control-sm" />
+                    </td>
+                    <td>
+                        <input asp-for="Players[@i].DataNascimento" type="date"
+                               class="form-control form-control-sm" />
+                    </td>
+                    <td>
+                        <input asp-for="Players[@i].Posicao" class="form-control form-control-sm" />
+                    </td>
+                    <td>
+                        <input asp-for="Players[@i].NumeroCamisa" type="number" min="0"
+                               class="form-control form-control-sm" />
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-danger remove-player">×</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <button type="button" id="addPlayer" class="btn btn-outline-primary btn-sm mb-4">
+        + Adicionar jogador
+    </button>
+
+    <button type="submit" class="btn btn-primary">Salvar</button>
+    <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <template id="playerRowTemplate">
+        <tr>
+            <td>
+                <input name="Players[__index__].Nome"
+                       class="form-control form-control-sm" />
+            </td>
+            <td>
+                <input name="Players[__index__].DataNascimento"
+                       type="date" class="form-control form-control-sm" />
+            </td>
+            <td>
+                <input name="Players[__index__].Posicao"
+                       class="form-control form-control-sm" />
+            </td>
+            <td>
+                <input name="Players[__index__].NumeroCamisa"
+                       type="number" min="0" class="form-control form-control-sm" />
+            </td>
+            <td>
+                <button type="button" class="btn btn-sm btn-danger remove-player">×</button>
+            </td>
+        </tr>
+    </template>
+
+    <script>
+        const addBtn = document.getElementById('addPlayer');
+        const tbody  = document.getElementById('playersBody');
+        const tpl    = document.getElementById('playerRowTemplate').innerHTML;
+        let idx = @Model.Players.Count;
+
+        addBtn.addEventListener('click', () => {
+          const html = tpl.replace(/__index__/g, idx++);
+          const tr = document.createElement('tr');
+          tr.innerHTML = html;
+          tr.querySelector('.remove-player')
+            .addEventListener('click', () => tr.remove());
+          tbody.appendChild(tr);
+        });
+
+        // attach remove-handler a qualquer linha existente
+        document.querySelectorAll('.remove-player')
+          .forEach(btn => btn.addEventListener('click', e => {
+            e.currentTarget.closest('tr').remove();
+          }));
+    </script>
+}

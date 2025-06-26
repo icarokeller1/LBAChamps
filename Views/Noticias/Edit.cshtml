@@ -1,0 +1,114 @@
+@model LBAChamps.Models.Noticia
+@{
+    ViewData["Title"] = "Editar notícia";
+}
+
+<h2>@ViewData["Title"]</h2>
+<hr />
+
+<form asp-action="Edit"
+      enctype="multipart/form-data"
+      novalidate
+      class="row g-3 needs-validation">
+
+    <!-- necessário para o binding -->
+    <input type="hidden" asp-for="IdNoticia" />
+
+    <!-- LIGA --------------------------------------------------------- -->
+    <div class="col-12">
+        <label class="form-label">Liga</label>
+        <select asp-for="IdLiga" class="form-select" asp-items="ViewBag.Ligas">
+            <option value="">(geral)</option>
+        </select>
+    </div>
+
+    <!-- TÍTULO / AUTOR ---------------------------------------------- -->
+    <div class="col-md-8">
+        <label asp-for="Titulo" class="form-label"></label>
+        <input asp-for="Titulo" class="form-control" required>
+        <div class="invalid-feedback">Título obrigatório.</div>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Autor" class="form-label"></label>
+        <input asp-for="Autor" class="form-control" required>
+        <div class="invalid-feedback">Autor obrigatório.</div>
+    </div>
+
+    <!-- SUBTÍTULO ---------------------------------------------------- -->
+    <div class="col-12">
+        <label asp-for="Subtitulo" class="form-label"></label>
+        <input asp-for="Subtitulo" class="form-control">
+    </div>
+
+    <!-- CONTEÚDO ----------------------------------------------------- -->
+    <div class="col-12">
+        <label asp-for="Conteudo" class="form-label">
+            Conteúdo (HTML ou Markdown)
+        </label>
+        <textarea asp-for="Conteudo" rows="8" class="form-control" required></textarea>
+        <div class="invalid-feedback">Conteúdo obrigatório.</div>
+    </div>
+
+    <!-- IMAGEM + INSTAGRAM ------------------------------------------ -->
+    <div class="col-md-6">
+        <label class="form-label">Imagem principal (PNG/JPEG &lt; 400 kB)</label>
+        <input type="file" name="imagemFile" id="imgFile"
+               accept="image/*" class="form-control">
+        <div class="mt-3">
+            @* preview inicial *@
+            <img id="preview"
+                 src="@($"/api/noticias/{Model.IdNoticia}/imagem")"
+                 onerror="this.classList.add('d-none')"
+                 class="rounded border"
+                 style="max-height:150px;">
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="LinkInstagram" class="form-label"></label>
+        <input asp-for="LinkInstagram" class="form-control"
+               placeholder="https://www.instagram.com/p/…">
+        <span asp-validation-for="LinkInstagram" class="text-danger"></span>
+    </div>
+
+    <!-- BOTÕES ------------------------------------------------------- -->
+    <div class="col-12 mt-2">
+        <button type="submit" class="btn btn-primary">Salvar</button>
+        <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        /* Bootstrap validation */
+        (() => {
+            const f = document.querySelector('.needs-validation');
+            f.addEventListener('submit', e => {
+                if (!f.checkValidity()) { e.preventDefault(); e.stopPropagation(); }
+                f.classList.add('was-validated');
+            }, false);
+        })();
+
+        /* Preview da nova imagem */
+        const fileInput = document.getElementById('imgFile');
+        const preview   = document.getElementById('preview');
+
+        fileInput.addEventListener('change', () => {
+            const [file] = fileInput.files ?? [];
+            if (!file) { preview.classList.add('d-none'); return; }
+
+            if (!file.type.startsWith('image/') || file.size > 400*1024) {
+                alert('Selecione uma imagem PNG/JPEG de até 400 kB.');
+                fileInput.value = '';
+                preview.classList.add('d-none');
+                return;
+            }
+            preview.src = URL.createObjectURL(file);
+            preview.classList.remove('d-none');
+        });
+    </script>
+}

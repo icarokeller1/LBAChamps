@@ -1,0 +1,124 @@
+﻿@model IEnumerable<LBAChamps.Models.Partida>
+@{
+    ViewData["Title"] = "Partidas";
+    var hoje = DateTime.Today;
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<!-- Alerta de erro (ex.: tentativa de exclusão bloqueada) -->
+@if (TempData["Error"] is string msg)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-lg"></i> Nova Partida
+    </a>
+</p>
+
+<!-- FORMULÁRIO DE FILTRO -->
+<form method="get" class="row row-cols-lg-auto g-2 align-items-end mb-3"
+      id="filtroForm">
+    <div class="col-12">
+        <label class="form-label">Liga</label>
+        <select id="ligaFiltro" name="ligaId" class="form-select"
+                asp-items="ViewBag.Ligas">
+            <option value="">(todas)</option>
+        </select>
+    </div>
+
+    <div class="col-12">
+        <label class="form-label">Time</label>
+        <select id="timeFiltro" name="timeId" class="form-select"
+                asp-items="ViewBag.Times">
+            <option value="">(todos)</option>
+        </select>
+    </div>
+
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary">Aplicar</button>
+        <a asp-action="Index" class="btn btn-secondary ms-1">Limpar</a>
+    </div>
+</form>
+
+<table class="table table-striped align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>Data</th>
+            <th>Mandante</th>
+            <th>Visitante</th>
+            <th class="text-center">Placar</th>
+            <th>@Html.DisplayNameFor(m => m.First().Liga)</th>
+            <th class="text-end">Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var p in Model)
+        {
+            bool isHoje = p.DataHora.Date == hoje;
+            <tr class="@(isHoje ? "table-warning" : "")">
+                <td>@p.DataHora.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@p.TimeCasa?.Nome</td>
+                <td>@p.TimeFora?.Nome</td>
+                <td class="text-center">@p.PlacarCasa x @p.PlacarFora</td>
+                <td>@p.Liga?.Nome</td>
+                <td class="text-end">
+                    @if (isHoje)
+                    {
+                        <a asp-action="CreateScout"
+                           asp-route-id="@p.IdPartida"
+                           class="btn btn-sm btn-outline-primary me-1">
+                            Criar Scout
+                        </a>
+                    }
+                    <a asp-action="Edit" asp-route-id="@p.IdPartida" class="btn btn-sm btn-primary">Editar</a>
+                    <a asp-action="Details" asp-route-id="@p.IdPartida" class="btn btn-sm btn-info ms-1">Detalhes</a>
+
+                    <!-- Botão que abre o modal de exclusão -->
+                    <button class="btn btn-sm btn-danger ms-1"
+                            data-bs-toggle="modal"
+                            data-bs-target="#confirmDeleteModal"
+                            data-title="Excluir Partida"
+                            data-message="Tem certeza que deseja excluir esta partida?"
+                            data-url="@Url.Action("Delete", "Partidas", new { id = p.IdPartida })">
+                        Excluir
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Modal reutilizável de confirmação -->
+@await Html.PartialAsync("_DeleteModal",
+("Excluir Registro", "Tem certeza que deseja excluir este item?", "#"))
+
+@section Scripts {
+    <script>
+        const apiBase = '/api';
+        const ligaSel  = document.getElementById('ligaFiltro');
+        const timeSel  = document.getElementById('timeFiltro');
+
+        function fill(sel, items) {
+          sel.innerHTML = '<option value="">(todos)</option>';
+          items.forEach(i => sel.add(new Option(i.nome, i.idTime)));
+        }
+
+        ligaSel.addEventListener('change', () => {
+          timeSel.disabled = true;
+          fill(timeSel, []);
+
+          const ligaId = ligaSel.value;
+          if (!ligaId) { timeSel.disabled = false; return; }
+
+          fetch(`${apiBase}/times/by-liga/${ligaId}`)
+            .then(r => r.ok ? r.json() : [])
+            .then(d => { fill(timeSel, d); timeSel.disabled = false; });
+        });
+    </script>
+}

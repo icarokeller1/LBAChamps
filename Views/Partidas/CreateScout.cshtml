@@ -1,0 +1,225 @@
+﻿@model PartidaScoutViewModel
+@{
+    ViewData["Title"] = "Nova Partida (Scout)";
+}
+
+<form asp-action="CreateScout" method="post" class="mt-3">
+    <div asp-validation-summary="All" class="alert alert-danger"></div>
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="IdPartida" />
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label>Liga</label>
+            <select asp-for="IdLiga" asp-items="Model.Ligas"
+                    id="ligaSelect" class="form-select">
+                <option value="">Selecione…</option>
+            </select>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label>Mandante</label>
+            <select asp-for="IdTimeCasa" asp-items="Model.Times"
+                    id="timeCasaSelect" class="form-select" disabled>
+                <option value="">Selecione…</option>
+            </select>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label>Visitante</label>
+            <select asp-for="IdTimeFora" asp-items="Model.Times"
+                    id="timeForaSelect" class="form-select" disabled>
+                <option value="">Selecione…</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="DataHora"></label>
+            <input asp-for="DataHora" class="form-control" />
+        </div>
+        <div class="col-md-8 mb-3">
+            <label asp-for="Local"></label>
+            <input asp-for="Local" class="form-control" />
+        </div>
+    </div>
+
+    <hr />
+
+    <!-- tabela de jogadores e estatísticas -->
+    <table class="table table-sm" id="statsTable">
+        <thead>
+            <tr>
+                <th>Jogador</th>
+                <th>Pontos</th>
+                <th>Rebotes</th>
+                <th>Assist.</th>
+                <th>Roubos</th>
+                <th>Tocos</th>
+                <th>Faltas</th>
+            </tr>
+        </thead>
+        <tbody>
+            @* será preenchido via JS *@
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-primary">Salvar tudo</button>
+    <span id="syncStatus" class="ms-3 text-success">Sincronizado</span>
+    <a asp-action="Index" class="btn btn-secondary ms-2">Voltar</a>
+</form>
+
+@section Scripts {
+    <script>
+        const apiBase    = '/api';
+        const form       = document.querySelector('form');
+        const token      = document.querySelector('input[name="__RequestVerificationToken"]').value;
+        const ligaSel    = document.getElementById('ligaSelect');
+        const casaSel    = document.getElementById('timeCasaSelect');
+        const foraSel    = document.getElementById('timeForaSelect');
+        const tblBody    = document.querySelector('#statsTable tbody');
+        const syncStatus = document.getElementById('syncStatus');
+
+        let isDirty = false;
+
+        function markDirty() {
+            if (!isDirty) {
+                isDirty = true;
+                syncStatus.textContent = 'Não sincronizado';
+                syncStatus.classList.replace('text-success', 'text-danger');
+            }
+        }
+
+        form.addEventListener('change', markDirty);
+        form.addEventListener('input',  markDirty);
+
+        function fillSelect(sel, items) {
+            sel.innerHTML = '<option value="">Selecione…</option>';
+            items.forEach(i => sel.add(new Option(i.nome, i.idTime)));
+            sel.disabled = items.length === 0;
+        }
+
+        function tryLoadPlayers() {
+            if (!casaSel.value || !foraSel.value) return Promise.resolve();
+
+            return Promise.all([
+                fetch(`${apiBase}/jogadores/by-time/${casaSel.value}`).then(r => r.json()),
+                fetch(`${apiBase}/jogadores/by-time/${foraSel.value}`).then(r => r.json())
+            ]).then(([casaJog, foraJog]) => {
+                const all = [...casaJog, ...foraJog];
+                tblBody.innerHTML = all.map((j, i) => `
+                    <tr>
+                        <td>
+                            <input type="hidden" name="Players[${i}].IdJogador" value="${j.idJogador}" />
+                            <input type="hidden" name="Players[${i}].IdTime"    value="${j.idTime}"    />
+                            ${j.nome} (${j.timeNome})
+                        </td>
+                        <td><input type="number" min="0" class="form-control form-control-sm" name="Players[${i}].Pontos" /></td>
+                        <td><input type="number" min="0" class="form-control form-control-sm" name="Players[${i}].Rebotes" /></td>
+                        <td><input type="number" min="0" class="form-control form-control-sm" name="Players[${i}].Assistencias" /></td>
+                        <td><input type="number" min="0" class="form-control form-control-sm" name="Players[${i}].RoubosBola" /></td>
+                        <td><input type="number" min="0" class="form-control form-control-sm" name="Players[${i}].Tocos" /></td>
+                        <td><input type="number" min="0" class="form-control form-control-sm" name="Players[${i}].Faltas" /></td>
+                    </tr>
+                `).join('');
+            });
+        }
+
+        function loadTimesAndPlayers(initial = false) {
+            tblBody.innerHTML = '';
+            casaSel.disabled = foraSel.disabled = true;
+
+            if (!ligaSel.value) return;
+
+            fetch(`${apiBase}/times/by-liga/${ligaSel.value}`)
+                .then(r => r.json())
+                .then(times => {
+                    fillSelect(casaSel, times);
+                    fillSelect(foraSel, times);
+
+                    if (initial) {
+                        const initialCasa = '@Model.IdTimeCasa';
+                        const initialFora = '@Model.IdTimeFora';
+                        if (initialCasa) casaSel.value = initialCasa;
+                        if (initialFora) foraSel.value = initialFora;
+                    }
+
+                    return tryLoadPlayers();
+                });
+        }
+
+        ligaSel.addEventListener('change', () => loadTimesAndPlayers(false));
+        casaSel.addEventListener('change', tryLoadPlayers);
+        foraSel.addEventListener('change', tryLoadPlayers);
+
+        // serializa o form em JSON, lidando com Players[idx].prop corretamente
+        function formToJson() {
+            const data = new FormData(form);
+            const obj = {};
+            for (const [key, value] of data.entries()) {
+                const segments = key.split(/[\[\]\.]+/).filter(s => s);
+                let cur = obj;
+                for (let i = 0; i < segments.length; i++) {
+                    const seg = segments[i];
+                    const isLast = i === segments.length - 1;
+                    const nextSeg = segments[i + 1];
+                    if (isLast) {
+                        cur[seg] = isNaN(value) ? value : Number(value);
+                    } else {
+                        // decide se deve ser array ou objeto
+                        if (/^\d+$/.test(nextSeg)) {
+                            if (!cur[seg]) cur[seg] = [];
+                        } else {
+                            if (!cur[seg]) cur[seg] = {};
+                        }
+                        cur = cur[seg];
+                    }
+                }
+            }
+            return obj;
+        }
+
+        // auto-save a cada 60s apenas se isDirty
+        setInterval(() => {
+            if (!isDirty) return;
+
+            fetch('/api/partidas/autosave', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token
+                },
+                body: JSON.stringify(formToJson())
+            })
+            .then(async res => {
+                const text = await res.text();
+                if (!res.ok) {
+                    throw new Error(`Status ${res.status}: ${res.statusText}\n${text}`);
+                }
+                return JSON.parse(text);
+            })
+            .then(data => {
+                const hid = form.querySelector('input[name="IdPartida"]');
+                if (!hid.value && data.idPartida) hid.value = data.idPartida;
+
+                isDirty = false;
+                const ts = new Date().toLocaleTimeString();
+                syncStatus.textContent = `Sincronizado às ${ts}`;
+                syncStatus.classList.replace('text-danger', 'text-success');
+            })
+            .catch(err => {
+                syncStatus.textContent = `Erro ao sincronizar: ${err.message}`;
+                syncStatus.classList.replace('text-success', 'text-danger');
+                console.error('Auto-save falhou', err);
+            });
+        }, 60000);
+
+        if (ligaSel.value) loadTimesAndPlayers(true);
+
+        form.addEventListener('submit', () => {
+            form.querySelectorAll('#statsTable tbody input[type="number"]').forEach(input => {
+                if (!input.value) input.value = '0';
+            });
+        });
+    </script>
+}
+

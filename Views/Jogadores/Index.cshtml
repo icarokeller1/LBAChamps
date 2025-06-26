@@ -1,0 +1,105 @@
+@model IEnumerable<LBAChamps.Models.Jogador>
+
+@{
+    ViewData["Title"] = "Jogadores";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@functions {
+    int Idade(DateOnly nasc)
+    {
+        var hoje  = DateOnly.FromDateTime(DateTime.Today);
+        var idade = hoje.Year - nasc.Year;
+        if (hoje < nasc.AddYears(idade)) idade--;
+        return idade;
+    }
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-lg"></i> Novo Jogador
+    </a>
+</p>
+
+<form method="get" class="row row-cols-lg-auto g-2 align-items-end mb-3">
+    <div class="col">
+        <label class="form-label">Liga</label>
+        <select id="fLiga" name="ligaId" class="form-select" asp-items="ViewBag.Ligas">
+            <option value="">(todas)</option>
+        </select>
+    </div>
+    <div class="col">
+        <label class="form-label">Time</label>
+        <select id="fTime" name="timeId" class="form-select" asp-items="ViewBag.Times">
+            <option value="">(todos)</option>
+        </select>
+    </div>
+    <div class="col">
+        <button type="submit" class="btn btn-primary">Aplicar</button>
+        <a asp-action="Index" class="btn btn-secondary ms-1">Limpar</a>
+    </div>
+</form>
+
+<table class="table table-striped align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>Nome</th>
+            <th>Idade</th>
+            <th>Função</th>
+            <th>Camisa</th>
+            <th>Time</th>
+            <th class="text-end">Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var j in Model)
+        {
+            <tr>
+                <td>@j.Nome</td>
+                <td>@Idade(j.DataNascimento) anos</td>
+                <td>@j.Posicao</td>
+                <td>@j.NumeroCamisa</td>
+                <td>@j.Time.Nome</td>
+                <td class="text-end">
+                    <a asp-action="Edit" asp-route-id="@j.IdJogador" class="btn btn-sm btn-primary">Editar</a>
+                    <a asp-action="Details" asp-route-id="@j.IdJogador" class="btn btn-sm btn-info ms-1">Detalhes</a>
+
+                    <!-- Botão que dispara o modal -->
+                    <button class="btn btn-sm btn-danger ms-1"
+                            data-bs-toggle="modal"
+                            data-bs-target="#confirmDeleteModal"
+                            data-title="Excluir Jogador"
+                            data-message="Tem certeza que deseja excluir o jogador '@j.Nome'?"
+                            data-url="@Url.Action("Delete", "Jogadores", new { id = j.IdJogador })">
+                        Excluir
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Renderiza o modal de confirmação (o JS atualiza título, texto e URL) -->
+@await Html.PartialAsync("_DeleteModal",
+("Excluir Registro", "Tem certeza que deseja excluir este item?", "#"))
+
+@section Scripts {
+    <script>
+        const apiBase='/api';
+        const ligaF = document.getElementById('fLiga');
+        const timeF = document.getElementById('fTime');
+
+        function fill(sel, items){ sel.innerHTML='<option value="">(todos)</option>';
+         items.forEach(i=>sel.add(new Option(i.nome, i.idTime))); }
+
+        ligaF.addEventListener('change', () => {
+          const id = ligaF.value;
+          fill(timeF, []);
+          if(!id) return;
+          fetch(`${apiBase}/times/by-liga/${id}`)
+            .then(r=>r.ok?r.json():[])
+            .then(d=>fill(timeF,d));
+        });
+    </script>
+}

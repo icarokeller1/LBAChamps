@@ -1,0 +1,100 @@
+@model LBAChamps.Models.Partida
+@{
+    ViewData["Title"] = "Nova Partida";
+}
+
+<h2>@ViewData["Title"]</h2>
+<hr />
+
+<form asp-action="Create">
+    <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+    <!-- LIGA ----------------------------------------------------------->
+    <div class="mb-3">
+        <label asp-for="IdLiga" class="form-label">Liga</label>
+        <select id="ligaSelect" asp-for="IdLiga" class="form-select" asp-items="ViewBag.Ligas">
+            <option value="">Selecione…</option>
+        </select>
+        <span asp-validation-for="IdLiga" class="text-danger"></span>
+    </div>
+
+    <!-- DATA / LOCAL --------------------------------------------------->
+    <div class="row g-3 mb-3">
+        <div class="col-md-4">
+            <label asp-for="DataHora" class="form-label">Data/Hora</label>
+            <input asp-for="DataHora" type="datetime-local" class="form-control" />
+            <span asp-validation-for="DataHora" class="text-danger"></span>
+        </div>
+        <div class="col-md-8">
+            <label asp-for="Local" class="form-label">Local</label>
+            <input asp-for="Local" class="form-control" />
+            <span asp-validation-for="Local" class="text-danger"></span>
+        </div>
+    </div>
+
+    <!-- TIMES ---------------------------------------------------------->
+    <div class="row g-3 mb-3">
+        <div class="col-md-6">
+            <label asp-for="IdTimeCasa" class="form-label">Time Mandante</label>
+            <select id="timeCasaSelect" asp-for="IdTimeCasa"
+                    class="form-select" asp-items="ViewBag.Times" disabled></select>
+            <span asp-validation-for="IdTimeCasa" class="text-danger"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="IdTimeFora" class="form-label">Time Visitante</label>
+            <select id="timeForaSelect" asp-for="IdTimeFora"
+                    class="form-select" asp-items="ViewBag.Times" disabled></select>
+            <span asp-validation-for="IdTimeFora" class="text-danger"></span>
+        </div>
+    </div>
+
+    <!-- PLACAR (opcional) --------------------------------------------->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <label asp-for="PlacarCasa" class="form-label">Placar Mandante</label>
+            <input asp-for="PlacarCasa" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label asp-for="PlacarFora" class="form-label">Placar Visitante</label>
+            <input asp-for="PlacarFora" class="form-control" />
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Salvar</button>
+    <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        const apiBase = '/api';              // proxy em dev ou domínio completo
+
+        const ligaSel   = document.getElementById('ligaSelect');
+        const casaSel   = document.getElementById('timeCasaSelect');
+        const foraSel   = document.getElementById('timeForaSelect');
+
+        function fill(sel, items) {
+          sel.innerHTML = '<option value="">Selecione…</option>';
+          items.forEach(i => sel.add(new Option(i.nome, i.idTime)));
+          sel.disabled = items.length === 0;
+          sel.value = '';
+        }
+
+        ligaSel.addEventListener('change', () => {
+          const ligaId = ligaSel.value;
+          fill(casaSel, []); fill(foraSel, []);
+          if (!ligaId) return;
+
+          fetch(`${apiBase}/times/by-liga/${ligaId}`)
+            .then(r => r.ok ? r.json() : [])          // evita JSON error
+            .then(d => { fill(casaSel, d); fill(foraSel, d); })
+            .catch(err => {
+                console.error(err);
+                alert('Não foi possível carregar os times desta liga.');
+            });
+        });
+    </script>
+}

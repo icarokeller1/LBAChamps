@@ -1,0 +1,62 @@
+﻿@model IEnumerable<LBAChamps.Models.Liga>
+@{
+    ViewData["Title"] = "Ligas";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@* ───── Alerta de erro (ex.: não conseguiu excluir) ───── *@
+@if (TempData["Error"] is string msg)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-lg"></i> Nova Liga
+    </a>
+</p>
+
+<table class="table table-striped align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>@Html.DisplayNameFor(m => m.First().Nome)</th>
+            <th>@Html.DisplayNameFor(m => m.First().Esporte)</th>
+            <th class="text-center">@Html.DisplayNameFor(m => m.First().Status)</th>
+            <th>@Html.DisplayNameFor(m => m.First().DataInicio)</th>
+            <th class="text-end">Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Nome</td>
+                <td>@item.Esporte</td>
+                <td class="text-center">@item.Status</td>
+                <td>@item.DataInicio.ToString("d")</td>
+                <td class="text-end">
+                    <a asp-action="Edit" asp-route-id="@item.IdLiga" class="btn btn-sm btn-primary">Editar</a>
+                    <a asp-action="Details" asp-route-id="@item.IdLiga" class="btn btn-sm btn-info ms-1">Detalhes</a>
+
+                    <!-- Botão que dispara o modal de confirmação -->
+                    <button class="btn btn-sm btn-danger ms-1"
+                            data-bs-toggle="modal"
+                            data-bs-target="#confirmDeleteModal"
+                            data-title="Excluir Liga"
+                            data-message="Tem certeza que deseja excluir a liga '@item.Nome'?"
+                            data-url="@Url.Action("DeleteConfirmed", "Ligas", new { id = item.IdLiga })">
+                        Excluir
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Modal de confirmação (conteúdo atualizado via delete-modal.js) -->
+@await Html.PartialAsync("_DeleteModal",
+("Excluir Registro", "Tem certeza que deseja excluir este item?", "#"))

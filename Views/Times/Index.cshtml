@@ -1,0 +1,75 @@
+@model IEnumerable<LBAChamps.Models.Time>
+@{
+    ViewData["Title"] = "Times";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<!-- Alerta de erro (ex.: exclusão bloqueada) -->
+@if (TempData["Error"] is string msg)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-lg"></i> Novo Time
+    </a>
+</p>
+
+<form method="get" class="row row-cols-lg-auto g-2 align-items-end mb-3">
+    <div class="col">
+        <label class="form-label">Liga</label>
+        <select name="ligaId" class="form-select" asp-items="ViewBag.Ligas">
+            <option value="">(todas)</option>
+        </select>
+    </div>
+    <div class="col">
+        <button type="submit" class="btn btn-primary">Aplicar</button>
+        <a asp-action="Index" class="btn btn-secondary ms-1">Limpar</a>
+    </div>
+</form>
+
+<table class="table table-striped align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>@Html.DisplayNameFor(m => m.First().Nome)</th>
+            <th>@Html.DisplayNameFor(m => m.First().Cidade)</th>
+            <th>@Html.DisplayNameFor(m => m.First().Estado)</th>
+            <th>@Html.DisplayNameFor(m => m.First().Liga)</th>
+            <th class="text-end">Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var t in Model)
+        {
+            <tr>
+                <td>@t.Nome</td>
+                <td>@t.Cidade</td>
+                <td>@t.Estado</td>
+                <td>@t.Liga?.Nome</td>
+                <td class="text-end">
+                    <a asp-action="Edit" asp-route-id="@t.IdTime" class="btn btn-sm btn-primary">Editar</a>
+                    <a asp-action="Details" asp-route-id="@t.IdTime" class="btn btn-sm btn-info ms-1">Detalhes</a>
+
+                    <!-- Botão que abre o modal de exclusão -->
+                    <button class="btn btn-sm btn-danger ms-1"
+                            data-bs-toggle="modal"
+                            data-bs-target="#confirmDeleteModal"
+                            data-title="Excluir Time"
+                            data-message="Tem certeza que deseja excluir o time '@t.Nome'?"
+                            data-url="@Url.Action("Delete", "Times", new { id = t.IdTime })">
+                        Excluir
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Modal de confirmação reutilizável -->
+@await Html.PartialAsync("_DeleteModal",
+("Excluir Registro", "Tem certeza que deseja excluir este item?", "#"))

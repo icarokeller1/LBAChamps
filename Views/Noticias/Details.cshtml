@@ -1,0 +1,34 @@
+@model LBAChamps.Models.Noticia
+@{
+    ViewData["Title"] = Model.Titulo;
+}
+
+<h2>@Model.Titulo</h2>
+
+@if (!string.IsNullOrWhiteSpace(Model.Subtitulo))
+{
+    <h5 class="text-muted">@Model.Subtitulo</h5>
+}
+
+<p class="text-muted">
+    Publicado em @Model.DataPublicacao.ToLocalTime():dd/MM/yyyy HH:mm
+    por <strong>@Model.Autor</strong>
+    @if (Model.Liga != null)
+    {
+        <text> – @Model.Liga.Nome</text>
+    }
+</p>
+<hr />
+
+@if (Model.Imagem != null)
+{
+    <img src="~/api/noticias/@Model.IdNoticia/imagem"
+         alt="imagem" class="img-fluid rounded mb-4" />
+}
+
+<div>
+    @Html.Raw(Model.Conteudo)
+</div>
+
+<a asp-action="Edit" asp-route-id="@Model.IdNoticia" class="btn btn-primary">Editar</a>
+<a asp-action="Index" class="btn btn-secondary ms-2">Voltar</a>

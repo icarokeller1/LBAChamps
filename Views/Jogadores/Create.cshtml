@@ -1,0 +1,101 @@
+@model LBAChamps.Models.Jogador
+@{
+    ViewData["Title"] = "Novo Jogador";
+}
+
+<h2 class="mb-4">Cadastrar jogador</h2>
+
+<form asp-action="Create" class="row g-3 needs-validation" novalidate>
+
+    <!-- LIGA --------------------------------------------------------- -->
+    <div class="col-12 col-md-6">
+        <label class="form-label">Liga</label>
+        <select id="selLiga" class="form-select" required>
+            <option selected disabled value="">Selecione...</option>
+            @foreach (var l in (SelectList)ViewBag.Ligas)
+            {
+                <option value="@l.Value">@l.Text</option>
+            }
+        </select>
+        <div class="invalid-feedback">Escolha a liga.</div>
+    </div>
+
+    <!-- TIME (depende da liga) -------------------------------------- -->
+    <div class="col-12 col-md-6">
+        <label asp-for="IdTime" class="form-label"></label>
+        <select asp-for="IdTime" id="selTime" class="form-select" required>
+            <option selected disabled value="">Escolha a liga primeiro...</option>
+        </select>
+        <div class="invalid-feedback">Escolha o time.</div>
+    </div>
+
+    <!-- NOME --------------------------------------------------------- -->
+    <div class="col-md-8">
+        <label asp-for="Nome" class="form-label"></label>
+        <input asp-for="Nome" class="form-control" required />
+        <div class="invalid-feedback">Informe o nome.</div>
+    </div>
+
+    <!-- POSIÇÃO ------------------------------------------------------ -->
+    <div class="col-md-4">
+        <label asp-for="Posicao" class="form-label"></label>
+        <input asp-for="Posicao" class="form-control" maxlength="30" required />
+        <div class="invalid-feedback">Posição obrigatória.</div>
+    </div>
+
+    <!-- DATA NASC ---------------------------------------------------- -->
+    <div class="col-md-4">
+        <label asp-for="DataNascimento" class="form-label"></label>
+        <input asp-for="DataNascimento" type="date" class="form-control" />
+    </div>
+
+    <!-- NRO CAMISA --------------------------------------------------- -->
+    <div class="col-md-4">
+        <label asp-for="NumeroCamisa" class="form-label"></label>
+        <input asp-for="NumeroCamisa" type="number" min="0" max="99"
+               class="form-control" required />
+        <div asp-validation-for="NumeroCamisa" class="invalid-feedback"></div>
+    </div>
+
+    <div class="col-12 mt-3">
+        <button type="submit" class="btn btn-primary">Salvar</button>
+        <a asp-action="Index" class="btn btn-outline-secondary ms-2">Cancelar</a>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        // ---- Bootstrap client-side validation -----------------------
+        (() => {
+            const forms = document.querySelectorAll('.needs-validation');
+            [...forms].forEach(f => {
+                f.addEventListener('submit', e => {
+                    if (!f.checkValidity()) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    f.classList.add('was-validated');
+                }, false);
+            });
+        })();
+
+        // ---- carrega Times ao mudar a Liga --------------------------
+        const selLiga = document.getElementById('selLiga');
+        const selTime = document.getElementById('selTime');
+
+        selLiga.addEventListener('change', async () => {
+            const id = selLiga.value;
+            selTime.innerHTML =
+              '<option selected disabled>Carregando...</option>';
+
+            const res = await fetch(`/api/times/by-liga/${id}`);
+            const lista = await res.json();
+
+            selTime.innerHTML =
+              '<option selected disabled value="">Selecione...</option>';
+            lista.forEach(t =>
+                selTime.insertAdjacentHTML('beforeend',
+                  `<option value="${t.idTime}">${t.nome}</option>`));
+        });
+    </script>
+}
