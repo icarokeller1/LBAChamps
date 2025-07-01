@@ -339,3 +339,4 @@ C:\Users\icaro\source\repos\LBAChamps\LBAChamps\obj\Release\net9.0\ref\LBAChamps
 C:\Users\icaro\source\repos\LBAChamps\LBAChamps\bin\Release\net9.0\Microsoft.AspNetCore.JsonPatch.dll
 C:\Users\icaro\source\repos\LBAChamps\LBAChamps\bin\Release\net9.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
 C:\Users\icaro\source\repos\LBAChamps\LBAChamps\bin\Release\net9.0\Newtonsoft.Json.Bson.dll
+C:\Users\icaro\source\repos\LBAChamps\LBAChamps\obj\Release\net9.0\LBAChamps.sourcelink.json

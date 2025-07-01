@@ -59,7 +59,26 @@
             </tr>
         </thead>
         <tbody>
-            @* será preenchido via JS *@
+            @if (Model.Players.Any())
+            {
+                for (int i = 0; i < Model.Players.Count; i++)
+                {
+                    var p = Model.Players[i];
+                    <tr>
+                        <td>
+                            <input type="hidden" name="Players[@i].IdJogador" value="@p.IdJogador" />
+                            <input type="hidden" name="Players[@i].IdTime" value="@p.IdTime" />
+                            @p.Nome
+                        </td>
+                        <td><input type="number" min="0" name="Players[@i].Pontos" class="form-control form-control-sm" value="@p.Pontos" /></td>
+                        <td><input type="number" min="0" name="Players[@i].Rebotes" class="form-control form-control-sm" value="@p.Rebotes" /></td>
+                        <td><input type="number" min="0" name="Players[@i].Assistencias" class="form-control form-control-sm" value="@p.Assistencias" /></td>
+                        <td><input type="number" min="0" name="Players[@i].RoubosBola" class="form-control form-control-sm" value="@p.RoubosBola" /></td>
+                        <td><input type="number" min="0" name="Players[@i].Tocos" class="form-control form-control-sm" value="@p.Tocos" /></td>
+                        <td><input type="number" min="0" name="Players[@i].Faltas" class="form-control form-control-sm" value="@p.Faltas" /></td>
+                    </tr>
+                }
+            }
         </tbody>
     </table>
 
@@ -78,6 +97,7 @@
         const foraSel    = document.getElementById('timeForaSelect');
         const tblBody    = document.querySelector('#statsTable tbody');
         const syncStatus = document.getElementById('syncStatus');
+        const initialPlayerCount = @Model.Players.Count;
 
         let isDirty = false;
 
@@ -125,7 +145,10 @@
         }
 
         function loadTimesAndPlayers(initial = false) {
-            tblBody.innerHTML = '';
+            // só limpa a tabela se for uma mudança de liga, não no carregamento inicial
+            if (!initial || initialPlayerCount == 0) {
+                tblBody.innerHTML = '';
+            }
             casaSel.disabled = foraSel.disabled = true;
 
             if (!ligaSel.value) return;
@@ -141,6 +164,10 @@
                         const initialFora = '@Model.IdTimeFora';
                         if (initialCasa) casaSel.value = initialCasa;
                         if (initialFora) foraSel.value = initialFora;
+                        if (initialPlayerCount > 0) {
+                            casaSel.disabled = foraSel.disabled = false;
+                            return;
+                        }
                     }
 
                     return tryLoadPlayers();

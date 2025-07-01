@@ -3,6 +3,7 @@ using LBAChamps.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Threading;
 
 namespace LBAChamps.Controllers;
 
@@ -253,6 +254,7 @@ public class PartidasController : Controller
             if (partida != null)
             {
                 // preenche os campos básicos
+                vm.IdPartida = partida.IdPartida;
                 vm.IdLiga = partida.IdLiga;
                 vm.IdTimeCasa = partida.IdTimeCasa;
                 vm.IdTimeFora = partida.IdTimeFora;
@@ -265,6 +267,33 @@ public class PartidasController : Controller
                               .OrderBy(t => t.Nome)
                               .Select(t => new SelectListItem(t.Nome, t.IdTime.ToString()))
                               .ToList();
+
+                       // ← Carrega jogadores e, se houver estatísticas antigas, preenche-as
+                var estatList = _db.EstatisticasPartidas
+                          .Where(e => e.IdPartida == partida.IdPartida)
+                          .ToList();
+                
+                vm.Players = _db.Jogadores
+                           .Include(j => j.Time)
+                           .Where(j => j.IdTime == partida.IdTimeCasa
+                                    || j.IdTime == partida.IdTimeFora)
+                           .OrderBy(j => j.Nome)
+                           .AsEnumerable()  // para usar FirstOrDefault em memória
+                           .Select((j, i) => {
+                    var est = estatList.FirstOrDefault(e => e.IdJogador == j.IdJogador);
+                    return new PlayerStatsViewModel
+                    {
+                        IdJogador = j.IdJogador,
+                        IdTime = j.IdTime,
+                        Nome = $"{j.Nome} ({j.Time!.Nome})",
+                        Pontos = est?.Pontos ?? 0,
+                        Rebotes = est?.Rebotes ?? 0,
+                        Assistencias = est?.Assistencias ?? 0,
+                        RoubosBola = est?.RoubosBola ?? 0,
+                        Tocos = est?.Tocos ?? 0,
+                        Faltas = est?.Faltas ?? 0
+                    };
+                }).ToList();
             }
         }
 
@@ -293,26 +322,44 @@ public class PartidasController : Controller
             return View(vm);
         }
 
-        var casaTotal = vm.Players
-            .Where(p => p.IdTime == vm.IdTimeCasa)
-            .Sum(p => p.Pontos);
-        var foraTotal = vm.Players
-            .Where(p => p.IdTime == vm.IdTimeFora)
-            .Sum(p => p.Pontos);
+        var casaTotal = vm.Players.Where(p => p.IdTime == vm.IdTimeCasa).Sum(p => p.Pontos);
+        var foraTotal = vm.Players.Where(p => p.IdTime == vm.IdTimeFora).Sum(p => p.Pontos);
 
         // 1) cria a Partida
-        var partida = new Partida
+        Partida partida;
+        if (vm.IdPartida.GetValueOrDefault() > 0)
         {
-            IdLiga = vm.IdLiga!.Value,
-            IdTimeCasa = vm.IdTimeCasa!.Value,
-            IdTimeFora = vm.IdTimeFora!.Value,
-            DataHora = vm.DataHora!.Value,
-            Local = vm.Local,
-            PlacarCasa = casaTotal,
-            PlacarFora = foraTotal
-        };
-        _db.Partidas.Add(partida);
-        await _db.SaveChangesAsync();
+            // atualização: carrega existente com estatísticas
+            partida = await _db.Partidas
+                       .Include(p => p.Estatisticas)
+                       .FirstOrDefaultAsync(p => p.IdPartida == vm.IdPartida.Value);
+            if (partida == null) return NotFound();
+            
+            // atualiza campos editáveis
+            partida.DataHora = vm.DataHora!.Value;
+            partida.Local = vm.Local;
+            partida.PlacarCasa = casaTotal;
+            partida.PlacarFora = foraTotal;
+            
+            // limpa estatísticas antigas
+            _db.EstatisticasPartidas.RemoveRange(partida.Estatisticas);
+            _db.Partidas.Update(partida);
+        }
+        else
+        {
+            // criação
+            partida = new Partida
+            {
+                IdLiga = vm.IdLiga!.Value,
+                IdTimeCasa = vm.IdTimeCasa!.Value,
+                IdTimeFora = vm.IdTimeFora!.Value,
+                DataHora = vm.DataHora!.Value,
+                Local = vm.Local,
+                PlacarCasa = casaTotal,
+                PlacarFora = foraTotal
+            };
+            _db.Partidas.Add(partida);
+        }
 
         // 2) para cada jogador com estatística > 0, cria EstatisticasPartida
         var estatList = vm.Players

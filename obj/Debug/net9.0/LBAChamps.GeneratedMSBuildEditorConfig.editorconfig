@@ -32,10 +32,6 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRXN0YXRpc3RpY2FzUGFydGlkYXNcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/icaro/source/repos/LBAChamps/LBAChamps/Views/EstatisticasPartidas/Details.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRXN0YXRpc3RpY2FzUGFydGlkYXNcRGV0YWlscy5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
 [C:/Users/icaro/source/repos/LBAChamps/LBAChamps/Views/EstatisticasPartidas/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRXN0YXRpc3RpY2FzUGFydGlkYXNcRWRpdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -56,10 +52,6 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSm9nYWRvcmVzXENyZWF0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/icaro/source/repos/LBAChamps/LBAChamps/Views/Jogadores/Details.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSm9nYWRvcmVzXERldGFpbHMuY3NodG1s
-build_metadata.AdditionalFiles.CssScope = 
-
 [C:/Users/icaro/source/repos/LBAChamps/LBAChamps/Views/Jogadores/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSm9nYWRvcmVzXEVkaXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
@@ -72,10 +64,6 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGlnYXNcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/icaro/source/repos/LBAChamps/LBAChamps/Views/Ligas/Details.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGlnYXNcRGV0YWlscy5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
 [C:/Users/icaro/source/repos/LBAChamps/LBAChamps/Views/Ligas/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGlnYXNcRWRpdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -86,10 +74,6 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/icaro/source/repos/LBAChamps/LBAChamps/Views/Noticias/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTm90aWNpYXNcQ3JlYXRlLmNzaHRtbA==
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/icaro/source/repos/LBAChamps/LBAChamps/Views/Noticias/Details.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTm90aWNpYXNcRGV0YWlscy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/icaro/source/repos/LBAChamps/LBAChamps/Views/Noticias/Edit.cshtml]
@@ -106,10 +90,6 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/icaro/source/repos/LBAChamps/LBAChamps/Views/Partidas/CreateScout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFydGlkYXNcQ3JlYXRlU2NvdXQuY3NodG1s
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/icaro/source/repos/LBAChamps/LBAChamps/Views/Partidas/Details.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFydGlkYXNcRGV0YWlscy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/icaro/source/repos/LBAChamps/LBAChamps/Views/Partidas/Edit.cshtml]
@@ -136,10 +116,6 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGltZXNcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/icaro/source/repos/LBAChamps/LBAChamps/Views/Times/Details.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGltZXNcRGV0YWlscy5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
 [C:/Users/icaro/source/repos/LBAChamps/LBAChamps/Views/Times/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGltZXNcRWRpdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -154,10 +130,6 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/icaro/source/repos/LBAChamps/LBAChamps/Views/Usuarios/Delete.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXN1YXJpb3NcRGVsZXRlLmNzaHRtbA==
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/icaro/source/repos/LBAChamps/LBAChamps/Views/Usuarios/Details.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXN1YXJpb3NcRGV0YWlscy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/icaro/source/repos/LBAChamps/LBAChamps/Views/Usuarios/Edit.cshtml]

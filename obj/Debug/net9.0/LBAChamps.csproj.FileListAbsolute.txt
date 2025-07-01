@@ -338,4 +338,5 @@ C:\Users\icaro\source\repos\LBAChamps\LBAChamps\obj\Debug\net9.0\compressed\knxa
 C:\Users\icaro\source\repos\LBAChamps\LBAChamps\bin\Debug\net9.0\Microsoft.AspNetCore.JsonPatch.dll
 C:\Users\icaro\source\repos\LBAChamps\LBAChamps\bin\Debug\net9.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
 C:\Users\icaro\source\repos\LBAChamps\LBAChamps\bin\Debug\net9.0\Newtonsoft.Json.Bson.dll
+C:\Users\icaro\source\repos\LBAChamps\LBAChamps\obj\Debug\net9.0\LBAChamps.sourcelink.json
 C:\Users\icaro\source\repos\LBAChamps\LBAChamps\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt

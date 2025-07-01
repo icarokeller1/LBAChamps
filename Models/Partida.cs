@@ -13,7 +13,7 @@ public class Partida
     [DataType(DataType.DateTime)]
     public DateTime DataHora { get; set; }
 
-    [Required, StringLength(160)]
+    [StringLength(160)]
     public string Local { get; set; } = default!;
 
     /* ──────────────── FKs ──────────────── */
@@ -26,8 +26,8 @@ public class Partida
     public Liga? Liga { get; set; }
 
     /* Placar */
-    public int PlacarCasa { get; set; } = 0;
-    public int PlacarFora { get; set; } = 0;
+    public int? PlacarCasa { get; set; }
+    public int? PlacarFora { get; set; }
 
     /* Estatísticas */
     public ICollection<EstatisticasPartida> Estatisticas { get; set; } = [];

@@ -23,11 +23,9 @@ public class NoticiasApiController : ControllerBase
             : File(n.Imagem, n.ImagemMimeType ?? "image/png");
     }
 
-    // GET api/noticias?ligaId=3&limite=10
+    // GET api/noticias?ligaId=3&limite=30
     [HttpGet]
-    public async Task<IActionResult> Listar(
-        [FromQuery] int? ligaId,
-        [FromQuery] int limite = 30)
+    public async Task<IActionResult> Listar([FromQuery] int? ligaId, [FromQuery] int limite = 30)
     {
         var q = _db.Noticias
                    .Include(n => n.Liga)
@@ -35,8 +33,10 @@ public class NoticiasApiController : ControllerBase
                    .AsQueryable();
 
         if (ligaId is not null)
-            // traz as notícias da liga OU as que não têm liga
             q = q.Where(n => n.IdLiga == ligaId || n.IdLiga == null);
+
+        // ** exclui quem tiver linkInstagram preenchido **
+        q = q.Where(n => string.IsNullOrEmpty(n.LinkInstagram));
 
         var lista = await q.Take(limite)
             .Select(n => new {
