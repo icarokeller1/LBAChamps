@@ -19,7 +19,6 @@ namespace LBAChamps.Controllers
             _db = context;
         }
 
-        // GET: Noticias
         public async Task<IActionResult> Index(int? ligaId)
         {
             ViewBag.Ligas = new SelectList(_db.Ligas.OrderBy(l => l.Nome),
@@ -35,7 +34,7 @@ namespace LBAChamps.Controllers
             return View(await q.AsNoTracking().ToListAsync());
         }
 
-        // GET: Noticias/Details/5
+
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -53,21 +52,17 @@ namespace LBAChamps.Controllers
             return View(noticia);
         }
 
-        // GET: Noticias/Create
         public IActionResult Create()
         {
             CarregarLigas();
             return View();
         }
 
-        // POST: Noticias/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Noticia noticia, IFormFile? imagemFile)
         {
-            // imagem opcional
             if (imagemFile is { Length: > 0 })
             {
                 using var ms = new MemoryStream();
@@ -76,7 +71,7 @@ namespace LBAChamps.Controllers
                 noticia.ImagemMimeType = imagemFile.ContentType;
             }
 
-            noticia.DataPublicacao = DateTime.UtcNow;   // sempre agora
+            noticia.DataPublicacao = DateTime.UtcNow;
 
             if (!ModelState.IsValid)
             {
@@ -89,7 +84,6 @@ namespace LBAChamps.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Noticias/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id is null) return NotFound();
@@ -101,9 +95,6 @@ namespace LBAChamps.Controllers
             return View(noticia);
         }
 
-        // POST: Noticias/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Noticia noticia, IFormFile? imagemFile)
@@ -138,7 +129,6 @@ namespace LBAChamps.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Noticias/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -156,7 +146,7 @@ namespace LBAChamps.Controllers
             return View(noticia);
         }
 
-        // POST: Noticias/Delete/5
+
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -177,7 +167,6 @@ namespace LBAChamps.Controllers
         }
 
 
-        // helper -----------------------------------------------------------------
         private void CarregarLigas(int? selecionada = null)
         {
             ViewBag.Ligas = new SelectList(

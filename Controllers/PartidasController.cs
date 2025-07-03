@@ -12,9 +12,6 @@ public class PartidasController : Controller
     private readonly LigaContext _db;
     public PartidasController(LigaContext context) => _db = context;
 
-    /*────────────────────────────────────────────────────────────*/
-    /* LISTAGEM                                                   */
-    /*────────────────────────────────────────────────────────────*/
     public async Task<IActionResult> Index(int? ligaId, int? timeId)
     {
         var q = _db.Partidas
@@ -35,12 +32,9 @@ public class PartidasController : Controller
         ViewData["Times"] = new SelectList(timesQuery.OrderBy(t => t.Nome),
                                            "IdTime", "Nome", timeId);
 
-        // carrega tudo
         var lista = await q.AsNoTracking().ToListAsync();
 
-        // separa quem é de hoje
         var hoje = DateTime.Today;
-        // ordena: primeiro os de hoje (DataHora.Date == hoje), depois o resto, ambos ordenados por DataHora
         lista = lista
             .OrderByDescending(p => p.DataHora.Date == hoje)
             .ThenBy(p => p.DataHora)
@@ -49,9 +43,6 @@ public class PartidasController : Controller
         return View(lista);
     }
 
-    /*────────────────────────────────────────────────────────────*/
-    /* DETAILS                                                    */
-    /*────────────────────────────────────────────────────────────*/
     public async Task<IActionResult> Details(int? id)
     {
         if (id is null) return NotFound();
@@ -67,21 +58,16 @@ public class PartidasController : Controller
     }
 
 
-    /*────────────────────────────────────────────────────────────*/
-    /* CREATE – GET                                               */
-    /*────────────────────────────────────────────────────────────*/
     public IActionResult Create()
     {
         ViewData["Ligas"] = new SelectList(_db.Ligas.OrderBy(l => l.Nome),
                                            "IdLiga", "Nome");
-        // Times vêm vazios (serão carregados via JS)
+
         ViewData["Times"] = new SelectList(Enumerable.Empty<object>(), "IdTime", "Nome");
         return View();
     }
 
-    /*────────────────────────────────────────────────────────────*/
-    /* CREATE – POST                                              */
-    /*────────────────────────────────────────────────────────────*/
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
@@ -107,8 +93,8 @@ public class PartidasController : Controller
         else
         {
             var dentroDoIntervalo = partida.DataHora.Date >= liga.DataInicio.ToDateTime(new())
-                                 && (liga.DataFim == null ||            // liga em aberto
-                                     partida.DataHora.Date <= liga.DataFim.Value.ToDateTime(new()));
+                                 && (liga.DataFim == null || 
+                                    partida.DataHora.Date <= liga.DataFim.Value.ToDateTime(new()));
 
             if (!dentroDoIntervalo)
                 ModelState.AddModelError("DataHora",
@@ -121,9 +107,7 @@ public class PartidasController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    /*────────────────────────────────────────────────────────────*/
-    /* EDIT – GET                                                 */
-    /*────────────────────────────────────────────────────────────*/
+
     public async Task<IActionResult> Edit(int? id)
     {
         if (id is null) return NotFound();
@@ -131,14 +115,11 @@ public class PartidasController : Controller
         var partida = await _db.Partidas.FindAsync(id);
         if (partida is null) return NotFound();
 
-        // agora só precisa do IdLiga
         CarregarDropdowns(partida.IdLiga);
         return View(partida);
     }
 
-    /*────────────────────────────────────────────────────────────*/
-    /* EDIT – POST                                                */
-    /*────────────────────────────────────────────────────────────*/
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id,
@@ -147,17 +128,14 @@ public class PartidasController : Controller
     {
         if (id != partidaPost.IdPartida) return NotFound();
 
-        // Recarrega do banco os valores originais dos times
         var original = await _db.Partidas
                                 .AsNoTracking()
                                 .FirstOrDefaultAsync(p => p.IdPartida == id);
         if (original is null) return NotFound();
 
-        // Mantém times originais (imutáveis)
         partidaPost.IdTimeCasa = original.IdTimeCasa;
         partidaPost.IdTimeFora = original.IdTimeFora;
 
-        // valida regra de não permitir mesmo time (já garantido, mas mantemos)
         if (partidaPost.IdTimeCasa == partidaPost.IdTimeFora)
             ModelState.AddModelError("IdTimeFora",
                 "O time visitante deve ser diferente do mandante.");
@@ -168,7 +146,6 @@ public class PartidasController : Controller
             return View(partidaPost);
         }
 
-        // valida intervalo de data na liga
         var liga = await _db.Ligas
                             .AsNoTracking()
                             .FirstOrDefaultAsync(l => l.IdLiga == partidaPost.IdLiga);
@@ -191,21 +168,16 @@ public class PartidasController : Controller
             return View(partidaPost);
         }
 
-        // atualiza apenas os campos permitidos
         _db.Entry(partidaPost).Property(p => p.DataHora).IsModified = true;
         _db.Entry(partidaPost).Property(p => p.Local).IsModified = true;
         _db.Entry(partidaPost).Property(p => p.IdLiga).IsModified = true;
         _db.Entry(partidaPost).Property(p => p.PlacarCasa).IsModified = true;
         _db.Entry(partidaPost).Property(p => p.PlacarFora).IsModified = true;
-        // times NÃO são modificados
 
         await _db.SaveChangesAsync();
         return RedirectToAction(nameof(Index));
     }
 
-    /*────────────────────────────────────────────────────────────*/
-    /* DELETE                                                     */
-    /*────────────────────────────────────────────────────────────*/
     public async Task<IActionResult> Delete(int? id)
     {
         if (id is null) return NotFound();
@@ -229,11 +201,9 @@ public class PartidasController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // GET: /Partidas/CreateScout or /Partidas/CreateScout/5
     [HttpGet]
     public IActionResult CreateScout(int? id)
     {
-        // monta o VM com as Ligas
         var vm = new PartidaScoutViewModel
         {
             Ligas = _db.Ligas
@@ -244,7 +214,6 @@ public class PartidasController : Controller
 
         if (id.HasValue)
         {
-            // busca a partida com os includes necessários
             var partida = _db.Partidas
                              .Include(p => p.TimeCasa)
                              .Include(p => p.TimeFora)
@@ -253,7 +222,6 @@ public class PartidasController : Controller
 
             if (partida != null)
             {
-                // preenche os campos básicos
                 vm.IdPartida = partida.IdPartida;
                 vm.IdLiga = partida.IdLiga;
                 vm.IdTimeCasa = partida.IdTimeCasa;
@@ -261,14 +229,12 @@ public class PartidasController : Controller
                 vm.DataHora = partida.DataHora;
                 vm.Local = partida.Local;
 
-                // carrega os Times daquele campeonato para o dropdown
                 vm.Times = _db.Times
                               .Where(t => t.IdLiga == partida.IdLiga)
                               .OrderBy(t => t.Nome)
                               .Select(t => new SelectListItem(t.Nome, t.IdTime.ToString()))
                               .ToList();
 
-                       // ← Carrega jogadores e, se houver estatísticas antigas, preenche-as
                 var estatList = _db.EstatisticasPartidas
                           .Where(e => e.IdPartida == partida.IdPartida)
                           .ToList();
@@ -278,7 +244,7 @@ public class PartidasController : Controller
                            .Where(j => j.IdTime == partida.IdTimeCasa
                                     || j.IdTime == partida.IdTimeFora)
                            .OrderBy(j => j.Nome)
-                           .AsEnumerable()  // para usar FirstOrDefault em memória
+                           .AsEnumerable()
                            .Select((j, i) => {
                     var est = estatList.FirstOrDefault(e => e.IdJogador == j.IdJogador);
                     return new PlayerStatsViewModel
@@ -300,18 +266,15 @@ public class PartidasController : Controller
         return View(vm);
     }
 
-    // POST: /Partidas/CreateScout
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateScout(PartidaScoutViewModel vm)
     {
-        // validações básicas
         if (vm.IdTimeCasa == vm.IdTimeFora)
             ModelState.AddModelError(nameof(vm.IdTimeFora),
                "O visitante deve ser diferente do mandante.");
 
         if (!ModelState.IsValid)
         {
-            // recarrega dropdowns
             vm.Ligas = _db.Ligas.OrderBy(l => l.Nome)
                                  .Select(l => new SelectListItem(l.Nome, l.IdLiga.ToString()))
                                  .ToList();
@@ -325,29 +288,24 @@ public class PartidasController : Controller
         var casaTotal = vm.Players.Where(p => p.IdTime == vm.IdTimeCasa).Sum(p => p.Pontos);
         var foraTotal = vm.Players.Where(p => p.IdTime == vm.IdTimeFora).Sum(p => p.Pontos);
 
-        // 1) cria a Partida
         Partida partida;
         if (vm.IdPartida.GetValueOrDefault() > 0)
         {
-            // atualização: carrega existente com estatísticas
             partida = await _db.Partidas
                        .Include(p => p.Estatisticas)
                        .FirstOrDefaultAsync(p => p.IdPartida == vm.IdPartida.Value);
             if (partida == null) return NotFound();
             
-            // atualiza campos editáveis
             partida.DataHora = vm.DataHora!.Value;
             partida.Local = vm.Local;
             partida.PlacarCasa = casaTotal;
             partida.PlacarFora = foraTotal;
             
-            // limpa estatísticas antigas
             _db.EstatisticasPartidas.RemoveRange(partida.Estatisticas);
             _db.Partidas.Update(partida);
         }
         else
         {
-            // criação
             partida = new Partida
             {
                 IdLiga = vm.IdLiga!.Value,
@@ -361,7 +319,6 @@ public class PartidasController : Controller
             _db.Partidas.Add(partida);
         }
 
-        // 2) para cada jogador com estatística > 0, cria EstatisticasPartida
         var estatList = vm.Players
             .Where(p => p.Pontos > 0
                      || p.Rebotes > 0
@@ -388,17 +345,13 @@ public class PartidasController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    /*────────────────────────────────────────────────────────────*/
-    /* AUXILIARES                                                 */
-    /*────────────────────────────────────────────────────────────*/
     private void CarregarDropdowns(int? ligaSel = null)
     {
-        // Liga
         ViewData["Ligas"] = new SelectList(
             _db.Ligas.OrderBy(l => l.Nome),
             "IdLiga", "Nome", ligaSel);
 
-        // Times filtrados pela liga selecionada
+
         var timesQuery = _db.Times.AsQueryable();
         if (ligaSel.HasValue)
             timesQuery = timesQuery.Where(t => t.IdLiga == ligaSel.Value);
@@ -408,13 +361,9 @@ public class PartidasController : Controller
             "IdTime", "Nome");
     }
 
-    /** impede mandar time contra ele mesmo  */
     private void ValidarTimes(Partida p)
     {
         if (p.IdTimeCasa == p.IdTimeFora)
             ModelState.AddModelError("IdTimeFora", "O time visitante deve ser diferente do mandante.");
     }
-
-    private bool PartidaExists(int id) =>
-        _db.Partidas.Any(e => e.IdPartida == id);
 }

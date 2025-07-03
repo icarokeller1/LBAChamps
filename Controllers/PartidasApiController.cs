@@ -4,15 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 [ApiController]
-[Route("api/partidas")]               // GET api/partidas
+[Route("api/partidas")]
 public class PartidasApiController : ControllerBase
 {
     private readonly LigaContext _db;
     public PartidasApiController(LigaContext db) => _db = db;
 
-    /// <summary>
-    /// Próximas partidas nos próximos N dias (default 7), sem filtro por liga.
-    /// </summary>
     [HttpGet("proximas")]
     public async Task<IActionResult> Proximas([FromQuery] int dias = 7)
     {
@@ -40,7 +37,7 @@ public class PartidasApiController : ControllerBase
         return Ok(lista);
     }
 
-    // GET api/partidas/by-liga/3
+
     [HttpGet("by-liga/{ligaId:int}")]
     public async Task<IActionResult> PorLiga(int ligaId)
     {
@@ -58,7 +55,7 @@ public class PartidasApiController : ControllerBase
         return Ok(lista);
     }
 
-    // GET api/partidas/by-liga-full/3
+
     [HttpGet("by-liga-full/{ligaId:int}")]
     public async Task<IActionResult> PorLigaCompleto(int ligaId)
     {
@@ -104,10 +101,8 @@ public class PartidasApiController : ControllerBase
             if (partida == null)
                 return NotFound();
 
-            // Atualiza campos básicos
             partida.DataHora = vm.DataHora!.Value;
             partida.Local = vm.Local;
-            // Remove estatísticas antigas
             _db.EstatisticasPartidas.RemoveRange(partida.Estatisticas);
         }
         else
@@ -123,7 +118,6 @@ public class PartidasApiController : ControllerBase
             _db.Partidas.Add(partida);
         }
 
-        // Calcular e atribuir placar antes de salvar estatísticas
         var casaTotal = vm.Players
             .Where(p => p.IdTime == partida.IdTimeCasa)
             .Sum(p => p.Pontos);
@@ -133,7 +127,6 @@ public class PartidasApiController : ControllerBase
         partida.PlacarCasa = casaTotal;
         partida.PlacarFora = foraTotal;
 
-        // Adiciona estatísticas
         var estatList = vm.Players
             .Where(p => p.Pontos > 0 || p.Rebotes > 0 || p.Assistencias > 0 || p.RoubosBola > 0 || p.Tocos > 0 || p.Faltas > 0)
             .Select(p => new EstatisticasPartida
@@ -154,9 +147,7 @@ public class PartidasApiController : ControllerBase
         return Ok(new { idPartida = partida.IdPartida });
     }
 
-    /// <summary>
-    /// Retorna a partida que está em andamento (até 90min após o início), sem filtro por liga, e suas estatísticas.
-    /// </summary>
+
     [HttpGet("atual")]
     public async Task<IActionResult> PartidaAtual()
     {
@@ -171,12 +162,12 @@ public class PartidasApiController : ControllerBase
             .Include(p => p.Estatisticas)
                 .ThenInclude(e => e.Jogador)
                     .ThenInclude(j => j.Time)
-            .OrderBy(p => p.DataHora) // pega a mais antiga que ainda está rolando
+            .OrderBy(p => p.DataHora)
             .AsNoTracking()
             .FirstOrDefaultAsync();
 
         if (partida == null)
-            return NoContent();  // 204 quando não há jogo em andamento
+            return NoContent();
 
         var result = new
         {

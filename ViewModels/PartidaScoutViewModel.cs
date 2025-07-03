@@ -16,12 +16,10 @@ public class PlayerStatsViewModel
 
 public class PartidaScoutViewModel
 {
-    // dropdown Ligas
     public int? IdPartida { get; set; }
     public int? IdLiga { get; set; }
     public List<SelectListItem> Ligas { get; set; } = new();
 
-    // dropdown Times (mesma lista para mandante e visitante)
     public int? IdTimeCasa { get; set; }
     public int? IdTimeFora { get; set; }
     public List<SelectListItem> Times { get; set; } = new();
@@ -32,6 +30,5 @@ public class PartidaScoutViewModel
     [Required, StringLength(160)]
     public string Local { get; set; } = "";
 
-    // lista de jogadores + estatísticas
     public List<PlayerStatsViewModel> Players { get; set; } = new();
 }

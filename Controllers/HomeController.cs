@@ -22,7 +22,6 @@ namespace LBAChamps.Controllers
         {
             var hoje = DateOnly.FromDateTime(DateTime.Today);
 
-            // agrupa por string (ATIVA, PLANEJADA, FINALIZADA)
             var resumo = await _context.Ligas
                 .GroupBy(l =>
                     l.Status == "ATIVA" ? "Ativas" :

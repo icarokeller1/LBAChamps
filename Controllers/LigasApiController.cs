@@ -6,15 +6,13 @@ using Microsoft.EntityFrameworkCore;
 namespace LBAChamps.Controllers;
 
 [ApiController]
-[Route("api/ligas")]               // GET api/ligas
+[Route("api/ligas")]
 public class LigasApiController : ControllerBase
 {
     private readonly LigaContext _db;
     public LigasApiController(LigaContext db) => _db = db;
 
-    /// <summary>
-    /// Lista ligas com filtros opcionais (?status=ATIVA&esporte=Basquete).
-    /// </summary>
+
     [HttpGet]
     public async Task<IEnumerable<Liga>> Get(
         [FromQuery] string? status,
@@ -34,7 +32,7 @@ public class LigasApiController : ControllerBase
             .ToListAsync();
     }
 
-    /// <summary>Detalhe por id – ex.: GET api/ligas/3</summary>
+
     [HttpGet("{id:int}")]
     public async Task<ActionResult<Liga>> Get(int id)
     {

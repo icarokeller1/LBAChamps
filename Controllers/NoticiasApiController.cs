@@ -9,7 +9,7 @@ public class NoticiasApiController : ControllerBase
     private readonly LigaContext _db;
     public NoticiasApiController(LigaContext db) => _db = db;
 
-    // GET api/noticias/5/imagem
+
     [HttpGet("{id:int}/imagem")]
     public async Task<IActionResult> Imagem(int id)
     {
@@ -23,7 +23,7 @@ public class NoticiasApiController : ControllerBase
             : File(n.Imagem, n.ImagemMimeType ?? "image/png");
     }
 
-    // GET api/noticias?ligaId=3&limite=30
+
     [HttpGet]
     public async Task<IActionResult> Listar([FromQuery] int? ligaId, [FromQuery] int limite = 30)
     {
@@ -35,7 +35,7 @@ public class NoticiasApiController : ControllerBase
         if (ligaId is not null)
             q = q.Where(n => n.IdLiga == ligaId || n.IdLiga == null);
 
-        // ** exclui quem tiver linkInstagram preenchido **
+
         q = q.Where(n => string.IsNullOrEmpty(n.LinkInstagram));
 
         var lista = await q.Take(limite)
@@ -54,7 +54,7 @@ public class NoticiasApiController : ControllerBase
         return Ok(lista);
     }
 
-    // GET api/noticias/5
+
     [HttpGet("{id:int}")]
     public async Task<IActionResult> Detalhe(int id)
     {
@@ -98,7 +98,7 @@ public class NoticiasApiController : ControllerBase
         var lista = await q.Take(limite)
             .Select(n => new {
                 n.IdNoticia,
-                n.LinkInstagram,                 // já no resumo
+                n.LinkInstagram,
                 n.Titulo,
                 Liga = n.Liga == null ? null : n.Liga.Nome
             })

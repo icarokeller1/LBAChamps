@@ -11,7 +11,7 @@ public class JogadoresApiController : ControllerBase
     private readonly LigaContext _db;
     public JogadoresApiController(LigaContext db) => _db = db;
 
-    // GET /api/jogadores?timeId=4&nome=jo
+
     [HttpGet]
     public async Task<IActionResult> Get(
         [FromQuery] int? timeId,
@@ -39,7 +39,7 @@ public class JogadoresApiController : ControllerBase
         return Ok(data);
     }
 
-    // GET /api/jogadores/8
+
     [HttpGet("{id:int}")]
     public async Task<IActionResult> Get(int id)
     {
@@ -51,7 +51,7 @@ public class JogadoresApiController : ControllerBase
         return jog is null ? NotFound() : Ok(jog);
     }
 
-    // GET api/jogadores/by-partida/10
+
     [HttpGet("by-partida/{partidaId:int}")]
     public async Task<IActionResult> PorPartida(int partidaId)
     {
@@ -74,19 +74,19 @@ public class JogadoresApiController : ControllerBase
         return Ok(jogadores);
     }
 
-    // Controllers/JogadoresApiController.cs
+
     [HttpGet("by-time/{timeId:int}")]
     public async Task<IActionResult> PorTime(int timeId)
     {
         var list = await _db.Jogadores
-            .Include(j => j.Time)                        // para ter j.Time.Nome
+            .Include(j => j.Time)
             .Where(j => j.IdTime == timeId)
             .OrderBy(j => j.Nome)
             .Select(j => new {
                 idJogador = j.IdJogador,
                 idTime = j.IdTime,
                 nome = j.Nome,
-                timeNome = j.Time.Nome               // expõe o nome do time
+                timeNome = j.Time.Nome
             })
             .ToListAsync();
 

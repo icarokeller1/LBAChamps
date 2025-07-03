@@ -5,7 +5,6 @@
 
 <h2>@ViewData["Title"]</h2>
 
-<!-- Alerta de erro (ex.: exclusão bloqueada) -->
 @if (TempData["Error"] is string msg)
 {
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -54,7 +53,6 @@
                 <td class="text-end">
                     <a asp-action="Edit" asp-route-id="@t.IdTime" class="btn btn-sm btn-primary">Editar</a>
 
-                    <!-- Botão que abre o modal de exclusão -->
                     <button class="btn btn-sm btn-danger ms-1"
                             data-bs-toggle="modal"
                             data-bs-target="#confirmDeleteModal"
@@ -69,6 +67,5 @@
     </tbody>
 </table>
 
-<!-- Modal de confirmação reutilizável -->
 @await Html.PartialAsync("_DeleteModal",
 ("Excluir Registro", "Tem certeza que deseja excluir este item?", "#"))

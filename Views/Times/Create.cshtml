@@ -7,7 +7,6 @@
     <div asp-validation-summary="All" class="alert alert-danger"></div>
     <input type="hidden" asp-for="IdTime" />
 
-    <!-- LIGA ------------------------------------------------------------->
     <div class="mb-3">
         <label asp-for="IdLiga" class="form-label">Liga</label>
         <select asp-for="IdLiga" class="form-select" asp-items="Model.Ligas">
@@ -16,7 +15,6 @@
         <span asp-validation-for="IdLiga" class="text-danger"></span>
     </div>
 
-    <!-- NOME / CIDADE / ESTADO ------------------------------------------>
     <div class="row g-3 mb-3">
         <div class="col-md-6">
             <label asp-for="Nome" class="form-label"></label>
@@ -35,7 +33,6 @@
         </div>
     </div>
 
-    <!-- LOGO ------------------------------------------------------------->
     <div class="mb-4">
         <label asp-for="LogoFile" class="form-label">
             Logo (PNG / JPEG &lt; 200 kB)
@@ -59,7 +56,6 @@
             </tr>
         </thead>
         <tbody id="playersBody">
-            @* linhas iniciais, se houver (edição) *@
             @for (int i = 0; i < Model.Players.Count; i++)
             {
                 <tr>
@@ -136,7 +132,6 @@
           tbody.appendChild(tr);
         });
 
-        // attach remove-handler a qualquer linha existente
         document.querySelectorAll('.remove-player')
           .forEach(btn => btn.addEventListener('click', e => {
             e.currentTarget.closest('tr').remove();

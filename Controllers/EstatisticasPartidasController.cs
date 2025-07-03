@@ -11,7 +11,7 @@ public class EstatisticasPartidasController : Controller
     private readonly LigaContext _db;
     public EstatisticasPartidasController(LigaContext db) => _db = db;
 
-    // ------------ LISTA ----------------------------------------------------
+
     public async Task<IActionResult> Index(int? ligaId, int? timeId, int? jogadorId)
     {
         var q = _db.EstatisticasPartidas
@@ -34,7 +34,6 @@ public class EstatisticasPartidasController : Controller
         if (jogadorId is not null)
             q = q.Where(e => e.IdJogador == jogadorId);
 
-        // --- combos -----------------
         ViewData["Ligas"] = new SelectList(
             _db.Ligas.OrderBy(l => l.Nome),
             "IdLiga", "Nome", ligaId);
@@ -60,38 +59,38 @@ public class EstatisticasPartidasController : Controller
         return View(lista);
     }
 
-    // ------------ DETAILS --------------------------------------------------
+
     public async Task<IActionResult> Details(int id)
     {
         var est = await _db.EstatisticasPartidas
             .Include(e => e.Partida)
-                .ThenInclude(p => p.TimeCasa)      // inclui mandante
+                .ThenInclude(p => p.TimeCasa)
             .Include(e => e.Partida)
-                .ThenInclude(p => p.TimeFora)      // inclui visitante
+                .ThenInclude(p => p.TimeFora)
             .Include(e => e.Jogador)
-                .ThenInclude(j => j.Time)          // opcional, mostra time do jogador
+                .ThenInclude(j => j.Time)
             .AsNoTracking()
             .FirstOrDefaultAsync(e => e.IdEstatistica == id);
 
         return est is null ? NotFound() : View(est);
     }
 
-    // ---- CREATE (GET) --------------------------------------------------------
+
     public IActionResult Create()
     {
-        CarregarDropDown();               // sem pré-selec.
+        CarregarDropDown();
         return View();
     }
 
-    // ---- CREATE (POST) -------------------------------------------------------
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
-        int LigaId,                      // ← vem do combo, fora do modelo
+        int LigaId,
         [Bind("IdPartida,IdJogador,Pontos,Rebotes,Assistencias,RoubosBola,Tocos,Faltas")]
     EstatisticasPartida est)
     {
-        // Apenas IdPartida/IdJogador precisam ser > 0
+
         if (!ModelState.IsValid)
         {
             CarregarDropDown(LigaId, est.IdPartida, est.IdJogador);
@@ -115,7 +114,6 @@ public class EstatisticasPartidasController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // ---- EDIT (GET) ----------------------------------------------------------
     public async Task<IActionResult> Edit(int id)
     {
         var est = await _db.EstatisticasPartidas
@@ -127,7 +125,7 @@ public class EstatisticasPartidasController : Controller
         return View(est);
     }
 
-    // ---- EDIT (POST) ---------------------------------------------------------
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, int LigaId,
@@ -147,7 +145,7 @@ public class EstatisticasPartidasController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // ------------ DELETE ---------------------------------------------------
+
     public async Task<IActionResult> Delete(int id)
     {
         var est = await _db.EstatisticasPartidas
@@ -168,17 +166,16 @@ public class EstatisticasPartidasController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // ---- HELPER --------------------------------------------------------------
+
     private void CarregarDropDown(int? ligaId = null,
                               int? partidaId = null,
                               int? jogadorId = null)
     {
-        // Ligas sempre disponíveis
         ViewData["Ligas"] = new SelectList(
             _db.Ligas.OrderBy(l => l.Nome),
             "IdLiga", "Nome", ligaId);
 
-        // Partidas SOMENTE se liga selecionada
+
         var partidasQuery = Enumerable.Empty<object>();
         if (ligaId is not null)
         {
@@ -194,7 +191,6 @@ public class EstatisticasPartidasController : Controller
         }
         ViewData["Partidas"] = new SelectList(partidasQuery, "IdPartida", "Descricao", partidaId);
 
-        // Jogadores SOMENTE se partida selecionada
         var jogadoresQuery = Enumerable.Empty<object>();
         if (partidaId is not null)
         {

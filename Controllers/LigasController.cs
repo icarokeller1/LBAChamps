@@ -10,34 +10,14 @@ public class LigasController : Controller
     private readonly LigaContext _context;
     public LigasController(LigaContext context) => _context = context;
 
-    /*────────────────────────────────────────────────────────────*/
-    /* LISTAGEM                                                   */
-    /*────────────────────────────────────────────────────────────*/
+
     public async Task<IActionResult> Index() =>
         View(await _context.Ligas.OrderBy(l => l.Nome).ToListAsync());
 
-    /*────────────────────────────────────────────────────────────*/
-    /* DETAILS                                                    */
-    /*────────────────────────────────────────────────────────────*/
-    public async Task<IActionResult> Details(int? id)
-    {
-        if (id is null) return NotFound();
 
-        var liga = await _context.Ligas
-                                 .Include(l => l.Times)
-                                 .FirstOrDefaultAsync(l => l.IdLiga == id);
-
-        return liga is null ? NotFound() : View(liga);
-    }
-
-    /*────────────────────────────────────────────────────────────*/
-    /* CREATE – GET                                               */
-    /*────────────────────────────────────────────────────────────*/
     public IActionResult Create() => View();
 
-    /*────────────────────────────────────────────────────────────*/
-    /* CREATE – POST                                              */
-    /*────────────────────────────────────────────────────────────*/
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
@@ -52,9 +32,7 @@ public class LigasController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    /*────────────────────────────────────────────────────────────*/
-    /* EDIT – GET                                                 */
-    /*────────────────────────────────────────────────────────────*/
+
     public async Task<IActionResult> Edit(int? id)
     {
         if (id is null) return NotFound();
@@ -63,9 +41,7 @@ public class LigasController : Controller
         return liga is null ? NotFound() : View(liga);
     }
 
-    /*────────────────────────────────────────────────────────────*/
-    /* EDIT – POST                                                */
-    /*────────────────────────────────────────────────────────────*/
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id,
@@ -90,9 +66,7 @@ public class LigasController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    /*────────────────────────────────────────────────────────────*/
-    /* DELETE                                                     */
-    /*────────────────────────────────────────────────────────────*/
+
     public async Task<IActionResult> Delete(int? id)
     {
         if (id is null) return NotFound();
@@ -121,9 +95,7 @@ public class LigasController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    /*────────────────────────────────────────────────────────────*/
-    /* AUXILIARES                                                 */
-    /*────────────────────────────────────────────────────────────*/
+
     private void ValidarLiga(Liga liga, int? ignoreId = null)
     {
         if (liga.DataFim is not null && liga.DataFim < liga.DataInicio)

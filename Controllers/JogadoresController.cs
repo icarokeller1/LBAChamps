@@ -11,9 +11,6 @@ public class JogadoresController : Controller
     private readonly LigaContext _db;
     public JogadoresController(LigaContext context) => _db = context;
 
-    /*-----------------------------------------------------------
-      LISTAGEM
-    -----------------------------------------------------------*/
     public async Task<IActionResult> Index(int? ligaId, int? timeId)
     {
         var q = _db.Jogadores
@@ -35,39 +32,18 @@ public class JogadoresController : Controller
         return View(await q.AsNoTracking().ToListAsync());
     }
 
-    /*-----------------------------------------------------------
-      DETAILS
-    -----------------------------------------------------------*/
-    public async Task<IActionResult> Details(int? id)
-    {
-        if (id is null) return NotFound();
-
-        var jogador = await _db.Jogadores
-            .Include(j => j.Time)
-                .ThenInclude(t => t.Liga)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(m => m.IdJogador == id);
-
-        return jogador is null ? NotFound() : View(jogador);
-    }
-
-    /*-----------------------------------------------------------
-      CREATE
-    -----------------------------------------------------------*/
     public IActionResult Create()
     {
         CarregarDropDown();
         return View();
     }
 
-    // POST: Jogadores/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(int ligaId,
         [Bind("Nome,DataNascimento,Posicao,NumeroCamisa,IdTime")]
     Jogador jogador)
     {
-        // regra: número de camisa não pode repetir no mesmo time
         bool repetido = await _db.Jogadores
             .AnyAsync(j => j.IdTime == jogador.IdTime &&
                            j.NumeroCamisa == jogador.NumeroCamisa);
@@ -86,8 +62,6 @@ public class JogadoresController : Controller
         await _db.SaveChangesAsync();
         return RedirectToAction(nameof(Index));
     }
-
-    // ---------- GET: Jogadores/Edit/5 ----------
     public async Task<IActionResult> Edit(int? id)
     {
         if (id == null) return NotFound();
@@ -96,16 +70,16 @@ public class JogadoresController : Controller
             .Include(j => j.Time)
             .FirstOrDefaultAsync(j => j.IdJogador == id);
 
-        if (jogador == null) return NotFound();
+        if (jogador == null) 
+            return NotFound();
 
-        // ▸ Liga atual do jogador
         var ligaId = jogador.Time!.IdLiga;
 
         ViewBag.Ligas = new SelectList(
             _db.Ligas.OrderBy(l => l.Nome),
             "IdLiga", "Nome", ligaId);
 
-        // ▸ Times da liga atual
+
         ViewBag.Times = new SelectList(
             _db.Times.Where(t => t.IdLiga == ligaId)
                           .OrderBy(t => t.Nome),
@@ -114,7 +88,6 @@ public class JogadoresController : Controller
         return View(jogador);
     }
 
-    // ---------- POST: Jogadores/Edit ----------
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, Jogador jogador)
@@ -132,7 +105,6 @@ public class JogadoresController : Controller
 
         if (!ModelState.IsValid)
         {
-            // repopula listas porque a view vai ser renderizada novamente
             var ligaId = _db.Times
                          .Where(t => t.IdTime == jogador.IdTime)
                          .Select(t => t.IdLiga)
@@ -164,9 +136,6 @@ public class JogadoresController : Controller
         }
     }
 
-    /*-----------------------------------------------------------
-      DELETE
-    -----------------------------------------------------------*/
     public async Task<IActionResult> Delete(int? id)
     {
         if (id is null) return NotFound();
@@ -188,9 +157,6 @@ public class JogadoresController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    /*-----------------------------------------------------------
-      AUXILIARES
-    -----------------------------------------------------------*/
     private void CarregarDropDown(int? ligaId = null, int? timeId = null)
     {
         ViewData["Ligas"] = new SelectList(

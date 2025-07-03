@@ -21,11 +21,11 @@ public class Time
     public byte[]? Logo { get; set; }
     public string? LogoMimeType { get; set; }
 
-    /* FK */
+
     public int IdLiga { get; set; }
     public Liga? Liga { get; set; }
 
-    /* Navegação inversa */
+
     public ICollection<Jogador> Jogadores { get; set; } = [];
     public ICollection<Partida> PartidasCasa { get; set; } = [];
     public ICollection<Partida> PartidasFora { get; set; } = [];

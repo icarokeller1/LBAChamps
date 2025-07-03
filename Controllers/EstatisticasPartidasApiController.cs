@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore;
 namespace LBAChamps.Controllers;
 
 [ApiController]
-[Route("api/estatisticaspartidas")]                 // /api/estatisticaspartidas
+[Route("api/estatisticaspartidas")]
 public class EstatisticasPartidasApiController : ControllerBase
 {
     private readonly LigaContext _db;
     public EstatisticasPartidasApiController(LigaContext db) => _db = db;
 
-    // GET /api/estatisticaspartidas?partidaId=3&minPontos=20
+
     [HttpGet]
     public async Task<IActionResult> Get(
         [FromQuery] int? partidaId,
@@ -46,7 +46,7 @@ public class EstatisticasPartidasApiController : ControllerBase
         return Ok(data);
     }
 
-    // GET /api/estatisticaspartidas/10
+
     [HttpGet("{id:int}")]
     public async Task<IActionResult> Get(int id)
     {
@@ -59,7 +59,7 @@ public class EstatisticasPartidasApiController : ControllerBase
         return est is null ? NotFound() : Ok(est);
     }
 
-    // GET api/estatisticaspartidas/by-liga-sum/3
+
     [HttpGet("by-liga-sum/{ligaId:int}")]
     public async Task<IActionResult> SumPorLiga(int ligaId)
     {
@@ -101,13 +101,13 @@ public class EstatisticasPartidasApiController : ControllerBase
                         (x.RoubosBola >= 10 ? 1 : 0) +
                         (x.Tocos >= 10 ? 1 : 0)) >= 3)
             })
-            .OrderByDescending(x => x.AvgPts)   // ou .EFF
+            .OrderByDescending(x => x.AvgPts)
             .ToListAsync();
 
         return Ok(stats);
     }
 
-    // GET api/estatisticaspartidas/by-jogador-hist/12
+
     [HttpGet("by-jogador-hist/{jogadorId:int}")]
     public async Task<IActionResult> HistoricoJogador(int jogadorId)
     {

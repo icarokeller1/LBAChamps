@@ -5,13 +5,12 @@ using Microsoft.EntityFrameworkCore;
 namespace LBAChamps.Controllers;
 
 [ApiController]
-[Route("api/times")]                 // /api/times
+[Route("api/times")]
 public class TimesApiController : ControllerBase
 {
     private readonly LigaContext _db;
     public TimesApiController(LigaContext db) => _db = db;
 
-    // GET /api/times?ligaId=3&estado=SP
     [HttpGet]
     public async Task<IActionResult> Get(
         [FromQuery] int? ligaId,
@@ -40,7 +39,6 @@ public class TimesApiController : ControllerBase
         return Ok(lista);
     }
 
-    // GET /api/times/2
     [HttpGet("{id:int}")]
     public async Task<IActionResult> Get(int id)
     {
@@ -62,13 +60,13 @@ public class TimesApiController : ControllerBase
             .AsNoTracking()
             .ToListAsync();
 
-        return Ok(lista);   // devolve JSON sempre (mesmo que seja [])
+        return Ok(lista);
     }
 
     [HttpGet("{id:int}/logo")]
     public async Task<IActionResult> GetLogo(int id)
     {
-        var t = await _db.Times                // _db == LigaContext
+        var t = await _db.Times
             .AsNoTracking()
             .Select(x => new { x.IdTime, x.Logo, x.LogoMimeType })
             .FirstOrDefaultAsync(x => x.IdTime == id);

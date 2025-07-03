@@ -3,14 +3,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LBAChamps.Data;
 
-/// <summary>
-/// DbContext da aplicação – usa SQL Server.
-/// </summary>
+
 public class LigaContext : DbContext
 {
     public LigaContext(DbContextOptions<LigaContext> options) : base(options) { }
 
-    // DbSets -----------------------------------------------------------------
     public DbSet<Liga> Ligas => Set<Liga>();
     public DbSet<Time> Times => Set<Time>();
     public DbSet<Usuario> Usuarios => Set<Usuario>();
@@ -19,28 +16,22 @@ public class LigaContext : DbContext
     public DbSet<EstatisticasPartida> EstatisticasPartidas => Set<EstatisticasPartida>();
     public DbSet<Noticia> Noticias => Set<Noticia>();
 
-    // Modelo -----------------------------------------------------------------
+
     protected override void OnModelCreating(ModelBuilder m)
     {
-        //---------------------------------------------------------------------
-        // LIGA
-        //---------------------------------------------------------------------
+
         m.Entity<Liga>()
             .HasIndex(l => new { l.Nome, l.Esporte })
             .IsUnique();
 
-        //---------------------------------------------------------------------
-        // TIME  (1 Liga -> * Times) – Delete: RESTRICT
-        //---------------------------------------------------------------------
+
         m.Entity<Time>()
             .HasOne(t => t.Liga)
             .WithMany(l => l.Times)
             .HasForeignKey(t => t.IdLiga)
             .OnDelete(DeleteBehavior.Restrict);
 
-        //---------------------------------------------------------------------
-        // JOGADOR  (1 Time -> * Jogadores) – Delete: CASCADE
-        //---------------------------------------------------------------------
+
         m.Entity<Jogador>()
             .HasOne(j => j.Time)
             .WithMany(t => t.Jogadores)
@@ -51,9 +42,7 @@ public class LigaContext : DbContext
          .HasIndex(j => new { j.IdTime, j.NumeroCamisa })
          .IsUnique();
 
-        //---------------------------------------------------------------------
-        // PARTIDA
-        //---------------------------------------------------------------------
+
         m.Entity<Partida>()
             .HasOne(p => p.Liga)
             .WithMany(l => l.Partidas)
@@ -76,9 +65,7 @@ public class LigaContext : DbContext
             .HasCheckConstraint("CK_Partida_TimesDiferentes",
                                 "[IdTimeCasa] <> [IdTimeFora]");
 
-        //---------------------------------------------------------------------
-        // ESTATÍSTICAS DA PARTIDA
-        //---------------------------------------------------------------------
+
         m.Entity<EstatisticasPartida>()
             .HasOne(e => e.Partida)
             .WithMany(p => p.Estatisticas)
@@ -95,20 +82,18 @@ public class LigaContext : DbContext
             .HasIndex(e => new { e.IdPartida, e.IdJogador })
             .IsUnique();
 
-        /* ------------------------------------------------
-           NOTÍCIA  (opcionalmente ligada a uma Liga)
-        ------------------------------------------------ */
+
         m.Entity<Noticia>()
-             .HasOne(n => n.Liga)        // navegação de Noticia → Liga
-             .WithMany(l => l.Noticias)  // (adicione a coleção em Liga ou use WithMany())
-             .HasForeignKey(n => n.IdLiga)       // FK é IdLiga (int?)
-             .OnDelete(DeleteBehavior.SetNull);  // se liga for excluída, notícia permanece
+             .HasOne(n => n.Liga)
+             .WithMany(l => l.Noticias)
+             .HasForeignKey(n => n.IdLiga)
+             .OnDelete(DeleteBehavior.SetNull);
 
         m.Entity<Noticia>()
             .Property(n => n.DataPublicacao)
             .HasDefaultValueSql("GETUTCDATE()");
 
-        // Você pode criar um índice para ordenar rápido por data:
+
         m.Entity<Noticia>()
             .HasIndex(n => n.DataPublicacao);
 

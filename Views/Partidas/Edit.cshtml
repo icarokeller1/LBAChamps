@@ -10,10 +10,8 @@
     <input type="hidden" asp-for="IdPartida" />
     <div asp-validation-summary="All" class="alert alert-danger"></div>
 
-    <!-- LIGA ----------------------------------------------------------->
     <div class="mb-3">
         <label asp-for="IdLiga" class="form-label">Liga</label>
-        <!-- mantemos o valor na postagem -->
         <input type="hidden" asp-for="IdLiga" />
         <select asp-for="IdLiga"
                 class="form-select"
@@ -24,7 +22,6 @@
         <span asp-validation-for="IdLiga" class="text-danger"></span>
     </div>
 
-    <!-- DATA / LOCAL --------------------------------------------------->
     <div class="row g-3 mb-3">
         <div class="col-md-4">
             <label asp-for="DataHora" class="form-label">Data/Hora</label>
@@ -38,7 +35,6 @@
         </div>
     </div>
 
-    <!-- TIMES ---------------------------------------------------------->
     <div class="row g-3 mb-3">
         <div class="col-md-6">
             <label asp-for="IdTimeCasa" class="form-label">Time Mandante</label>
@@ -64,7 +60,6 @@
         </div>
     </div>
 
-    <!-- PLACAR (opcional) --------------------------------------------->
     <div class="row g-3 mb-4">
         <div class="col-md-3">
             <label asp-for="PlacarCasa" class="form-label">Placar Mandante</label>
@@ -86,7 +81,7 @@
     }
 
     <script>
-        const apiBase = '/api';              // proxy em dev ou domínio completo
+        const apiBase = '/api';
 
         const ligaSel   = document.getElementById('ligaSelect');
         const casaSel   = document.getElementById('timeCasaSelect');
@@ -105,7 +100,7 @@
           if (!ligaId) return;
 
           fetch(`${apiBase}/times/by-liga/${ligaId}`)
-            .then(r => r.ok ? r.json() : [])          // evita JSON error
+            .then(r => r.ok ? r.json() : [])
             .then(d => { fill(casaSel, d); fill(foraSel, d); })
             .catch(err => {
                 console.error(err);

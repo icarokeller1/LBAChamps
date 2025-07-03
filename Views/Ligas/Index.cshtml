@@ -5,7 +5,6 @@
 
 <h2>@ViewData["Title"]</h2>
 
-@* ───── Alerta de erro (ex.: não conseguiu excluir) ───── *@
 @if (TempData["Error"] is string msg)
 {
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -41,7 +40,6 @@
                 <td class="text-end">
                     <a asp-action="Edit" asp-route-id="@item.IdLiga" class="btn btn-sm btn-primary">Editar</a>
 
-                    <!-- Botão que dispara o modal de confirmação -->
                     <button class="btn btn-sm btn-danger ms-1"
                             data-bs-toggle="modal"
                             data-bs-target="#confirmDeleteModal"
@@ -56,6 +54,5 @@
     </tbody>
 </table>
 
-<!-- Modal de confirmação (conteúdo atualizado via delete-modal.js) -->
 @await Html.PartialAsync("_DeleteModal",
 ("Excluir Registro", "Tem certeza que deseja excluir este item?", "#"))

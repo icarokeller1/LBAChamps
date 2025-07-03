@@ -20,11 +20,9 @@ public class Jogador
     [Range(0, 99, ErrorMessage = "Número de camisa deve ser 0-99")]
     public int NumeroCamisa { get; set; }
 
-    /* FK */
     public int IdTime { get; set; }
 
     public Time? Time { get; set; }
 
-    /* Inverso */
     public ICollection<EstatisticasPartida> Estatisticas { get; set; } = [];
 }

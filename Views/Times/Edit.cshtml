@@ -11,7 +11,6 @@
     <div asp-validation-summary="All" class="alert alert-danger"></div>
     <input type="hidden" asp-for="IdTime" />
 
-    <!-- LIGA -->
     <div class="mb-3">
         <label asp-for="IdLiga" class="form-label">Liga</label>
         <select asp-for="IdLiga" class="form-select" asp-items="Model.Ligas">
@@ -20,7 +19,6 @@
         <span asp-validation-for="IdLiga" class="text-danger"></span>
     </div>
 
-    <!-- NOME / CIDADE / ESTADO -->
     <div class="row g-3 mb-3">
         <div class="col-md-6">
             <label asp-for="Nome" class="form-label"></label>
@@ -39,7 +37,6 @@
         </div>
     </div>
 
-    <!-- LOGO (preview da imagem existente, se houver) -->
     <div class="mb-4">
         <label class="form-label">Logo (PNG / JPEG &lt; 200 kB)</label>
         <input type="file" asp-for="LogoFile" accept="image/png, image/jpeg" class="form-control" />
@@ -137,7 +134,6 @@
     </template>
 
     <script>
-        // preview do logo (mesmo script do Create)
         const inputFile = document.getElementById('LogoFile');
         const preview   = document.getElementById('previewImg');
         inputFile?.addEventListener('change', () => {
@@ -157,7 +153,6 @@
             preview.classList.remove('d-none');
         });
 
-        // adicionar / remover linhas de jogador
         const addBtn = document.getElementById('addPlayer');
         const tbody  = document.getElementById('playersBody');
         const tpl    = document.getElementById('playerRowTemplate').innerHTML;
@@ -172,7 +167,6 @@
             tbody.appendChild(tr);
         });
 
-        // attach remove handlers on existing rows
         document.querySelectorAll('.remove-player')
             .forEach(btn => btn.addEventListener('click', e => {
                 e.currentTarget.closest('tr').remove();

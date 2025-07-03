@@ -21,10 +21,8 @@ namespace LBAChamps.Controllers
             _db = context;
         }
 
-        // GET: Times
         public async Task<IActionResult> Index(int? ligaId)
         {
-            // lista de ligas para o filtro
             ViewBag.Ligas = new SelectList(
                 _db.Ligas.OrderBy(l => l.Nome), "IdLiga", "Nome", ligaId);
 
@@ -38,7 +36,6 @@ namespace LBAChamps.Controllers
             return View(await q.AsNoTracking().ToListAsync());
         }
 
-        // GET: Times/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -57,7 +54,6 @@ namespace LBAChamps.Controllers
             return View(time);
         }
 
-        // GET: Times/Create
         public IActionResult Create()
         {
             var vm = new TimeCreateViewModel
@@ -66,12 +62,10 @@ namespace LBAChamps.Controllers
                            .OrderBy(l => l.Nome)
                            .Select(l => new SelectListItem(l.Nome, l.IdLiga.ToString()))
                            .ToList()
-                // Players já inicia vazia
             };
             return View(vm);
         }
 
-        // POST: Times/Create
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(TimeCreateViewModel vm)
         {
@@ -84,7 +78,6 @@ namespace LBAChamps.Controllers
                 return View(vm);
             }
 
-            // 1) cria Time
             var time = new Time
             {
                 Nome = vm.Nome,
@@ -93,7 +86,6 @@ namespace LBAChamps.Controllers
                 IdLiga = vm.IdLiga
             };
 
-            // logo
             if (vm.LogoFile is not null && vm.LogoFile.Length > 0)
             {
                 using var ms = new MemoryStream();
@@ -105,7 +97,6 @@ namespace LBAChamps.Controllers
             _db.Times.Add(time);
             await _db.SaveChangesAsync();
 
-            // 2) cria Jogadores
             foreach (var p in vm.Players
                                 .Where(p => !string.IsNullOrWhiteSpace(p.Nome)))
             {
@@ -124,7 +115,6 @@ namespace LBAChamps.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Times/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -141,16 +131,13 @@ namespace LBAChamps.Controllers
                 Cidade = time.Cidade,
                 Estado = time.Estado,
                 IdLiga = time.IdLiga,
-                // monta preview inline do logo existente, se houver
                 LogoExistingPath = time.Logo != null
                     ? $"data:{time.LogoMimeType};base64,{Convert.ToBase64String(time.Logo)}"
                     : null,
-                // dropdown de ligas
                 Ligas = await _db.Ligas
                     .OrderBy(l => l.Nome)
                     .Select(l => new SelectListItem(l.Nome, l.IdLiga.ToString()))
                     .ToListAsync(),
-                // popula jogadores atuais
                 Players = time.Jogadores
                     .Select(j => new PlayerEditViewModel
                     {
@@ -166,13 +153,11 @@ namespace LBAChamps.Controllers
             return View(vm);
         }
 
-        // POST: Times/Edit/5
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(TimeEditViewModel vm)
         {
             if (!ModelState.IsValid)
             {
-                // repopula dropdown de ligas em caso de erro
                 vm.Ligas = await _db.Ligas
                     .OrderBy(l => l.Nome)
                     .Select(l => new SelectListItem(l.Nome, l.IdLiga.ToString()))
@@ -180,7 +165,6 @@ namespace LBAChamps.Controllers
                 return View(vm);
             }
 
-            // 1) Atualiza entidade Time
             var time = await _db.Times.FindAsync(vm.IdTime);
             if (time == null) return NotFound();
 
@@ -189,7 +173,6 @@ namespace LBAChamps.Controllers
             time.Estado = vm.Estado;
             time.IdLiga = vm.IdLiga;
 
-            // se trocou o logo
             if (vm.LogoFile is not null && vm.LogoFile.Length > 0)
             {
                 using var ms = new MemoryStream();
@@ -198,28 +181,23 @@ namespace LBAChamps.Controllers
                 time.LogoMimeType = vm.LogoFile.ContentType;
             }
 
-            // 2) Lida com jogadores
             var existentes = await _db.Jogadores
                 .Where(j => j.IdTime == vm.IdTime)
                 .ToListAsync();
 
-            // IDs que vieram no form (somente os que não são zero)
             var enviadosIds = vm.Players
                 .Where(p => p.IdJogador > 0)
                 .Select(p => p.IdJogador)
                 .ToHashSet();
 
-            // 2.a) Remover do banco quem foi excluído na UI
             var paraRemover = existentes
                 .Where(j => !enviadosIds.Contains(j.IdJogador));
             _db.Jogadores.RemoveRange(paraRemover);
 
-            // 2.b) Atualizar os existentes e adicionar os novos
             foreach (var p in vm.Players)
             {
                 if (p.IdJogador > 0)
                 {
-                    // atualiza
                     var j = existentes.First(j0 => j0.IdJogador == p.IdJogador);
                     j.Nome = p.Nome;
                     j.DataNascimento = p.DataNascimento;
@@ -228,7 +206,6 @@ namespace LBAChamps.Controllers
                 }
                 else
                 {
-                    // só adiciona se nome não vazio
                     if (!string.IsNullOrWhiteSpace(p.Nome))
                     {
                         _db.Jogadores.Add(new Jogador
@@ -247,7 +224,6 @@ namespace LBAChamps.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Times/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -266,7 +242,6 @@ namespace LBAChamps.Controllers
             return View(time);
         }
 
-        // POST: Times/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

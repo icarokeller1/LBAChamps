@@ -64,7 +64,6 @@
                 <td class="text-end">
                     <a asp-action="Edit" asp-route-id="@j.IdJogador" class="btn btn-sm btn-primary">Editar</a>
 
-                    <!-- Botão que dispara o modal -->
                     <button class="btn btn-sm btn-danger ms-1"
                             data-bs-toggle="modal"
                             data-bs-target="#confirmDeleteModal"
@@ -79,7 +78,6 @@
     </tbody>
 </table>
 
-<!-- Renderiza o modal de confirmação (o JS atualiza título, texto e URL) -->
 @await Html.PartialAsync("_DeleteModal",
 ("Excluir Registro", "Tem certeza que deseja excluir este item?", "#"))
 

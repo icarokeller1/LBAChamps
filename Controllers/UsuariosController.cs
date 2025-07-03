@@ -11,15 +11,9 @@ public class UsuariosController : Controller
     private readonly LigaContext _context;
     public UsuariosController(LigaContext context) => _context = context;
 
-    /*────────────────────────────────────────────────────────────*/
-    /* LISTAGEM                                                   */
-    /*────────────────────────────────────────────────────────────*/
     public async Task<IActionResult> Index() =>
         View(await _context.Usuarios.OrderBy(u => u.Nome).ToListAsync());
 
-    /*────────────────────────────────────────────────────────────*/
-    /* DETAILS                                                    */
-    /*────────────────────────────────────────────────────────────*/
     public async Task<IActionResult> Details(int? id)
     {
         if (id is null) return NotFound();
@@ -28,18 +22,12 @@ public class UsuariosController : Controller
         return user is null ? NotFound() : View(user);
     }
 
-    /*────────────────────────────────────────────────────────────*/
-    /* CREATE – GET                                               */
-    /*────────────────────────────────────────────────────────────*/
     public IActionResult Create()
     {
         CarregarTipos();
         return View();
     }
 
-    /*────────────────────────────────────────────────────────────*/
-    /* CREATE – POST                                              */
-    /*────────────────────────────────────────────────────────────*/
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
@@ -59,9 +47,6 @@ public class UsuariosController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    /*────────────────────────────────────────────────────────────*/
-    /* EDIT – GET                                                 */
-    /*────────────────────────────────────────────────────────────*/
     public async Task<IActionResult> Edit(int? id)
     {
         if (id is null) return NotFound();
@@ -73,9 +58,6 @@ public class UsuariosController : Controller
         return View(usuario);
     }
 
-    /*────────────────────────────────────────────────────────────*/
-    /* EDIT – POST                                                */
-    /*────────────────────────────────────────────────────────────*/
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id,
@@ -93,7 +75,6 @@ public class UsuariosController : Controller
 
         try
         {
-            // TODO: aplicar hash se Senha foi alterada
             _context.Update(usuario);
             await _context.SaveChangesAsync();
         }
@@ -105,9 +86,6 @@ public class UsuariosController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    /*────────────────────────────────────────────────────────────*/
-    /* DELETE                                                     */
-    /*────────────────────────────────────────────────────────────*/
     public async Task<IActionResult> Delete(int? id)
     {
         if (id is null) return NotFound();
@@ -127,9 +105,6 @@ public class UsuariosController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    /*────────────────────────────────────────────────────────────*/
-    /* AUXILIARES                                                 */
-    /*────────────────────────────────────────────────────────────*/
     private void CarregarTipos(string? selecionado = null)
     {
         var tipos = new[] { "ADMIN", "ORGANIZADOR", "ATLETA" };

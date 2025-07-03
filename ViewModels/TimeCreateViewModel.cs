@@ -22,7 +22,6 @@ namespace LBAChamps.ViewModels
 
     public class TimeCreateViewModel
     {
-        // Time
         public int? IdTime { get; set; }           // para edição, mas no Create fica nulo
         [Required, StringLength(120)]
         public string Nome { get; set; } = "";

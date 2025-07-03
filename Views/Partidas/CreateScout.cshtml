@@ -45,7 +45,6 @@
 
     <hr />
 
-    <!-- tabela de jogadores e estatísticas -->
     <table class="table table-sm" id="statsTable">
         <thead>
             <tr>
@@ -145,7 +144,6 @@
         }
 
         function loadTimesAndPlayers(initial = false) {
-            // só limpa a tabela se for uma mudança de liga, não no carregamento inicial
             if (!initial || initialPlayerCount == 0) {
                 tblBody.innerHTML = '';
             }
@@ -178,7 +176,6 @@
         casaSel.addEventListener('change', tryLoadPlayers);
         foraSel.addEventListener('change', tryLoadPlayers);
 
-        // serializa o form em JSON, lidando com Players[idx].prop corretamente
         function formToJson() {
             const data = new FormData(form);
             const obj = {};
@@ -192,7 +189,6 @@
                     if (isLast) {
                         cur[seg] = isNaN(value) ? value : Number(value);
                     } else {
-                        // decide se deve ser array ou objeto
                         if (/^\d+$/.test(nextSeg)) {
                             if (!cur[seg]) cur[seg] = [];
                         } else {
@@ -205,7 +201,6 @@
             return obj;
         }
 
-        // auto-save a cada 60s apenas se isDirty
         setInterval(() => {
             if (!isDirty) return;
 

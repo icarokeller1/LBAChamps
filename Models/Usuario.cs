@@ -15,8 +15,8 @@ public class Usuario
 
     [Required, StringLength(255)]
     [DataType(DataType.Password)]
-    public string Senha { get; set; } = default!;   // guarde aqui o hash
+    public string Senha { get; set; } = default!;
 
     [Required, StringLength(30)]
-    public string Tipo { get; set; } = default!;    // ADMIN, ORGANIZADOR, ATLETA…
+    public string Tipo { get; set; } = default!;
 }

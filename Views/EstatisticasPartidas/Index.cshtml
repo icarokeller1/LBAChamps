@@ -5,7 +5,6 @@
 
 <h2>@ViewData["Title"]</h2>
 
-<!-- Alerta caso TempData["Error"] esteja presente -->
 @if (TempData["Error"] is string msg)
 {
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -28,7 +27,7 @@
         </select>
     </div>
     <div class="col">
-        <label class="form-label">Mandante</label>
+        <label class="form-label">Time</label>
         <select id="timeFiltro" name="timeId" class="form-select" asp-items="ViewBag.Times">
             <option value="">(todos)</option>
         </select>
@@ -82,7 +81,6 @@
                 <td class="text-end">
                     <a asp-action="Edit" asp-route-id="@e.IdEstatistica" class="btn btn-sm btn-primary">Editar</a>
 
-                    <!-- botão que apenas dispara o modal -->
                     <button class="btn btn-sm btn-danger ms-1"
                             data-bs-toggle="modal"
                             data-bs-target="#confirmDeleteModal"
@@ -97,7 +95,6 @@
     </tbody>
 </table>
 
-<!-- Modal de confirmação -->
 @await Html.PartialAsync("_DeleteModal",
 ("Excluir Registro", "Tem certeza que deseja excluir este item?", "#"))
 
@@ -116,7 +113,7 @@
         function fill(sel, items, text, value) {
           sel.innerHTML = '<option value="">(todos)</option>';
           items.forEach(i => sel.add(new Option(i[text], i[value])));
-          sel.value = '';               // limpa seleção anterior
+          sel.value = '';
         }
 
         ligaSel.addEventListener('change', () => {
