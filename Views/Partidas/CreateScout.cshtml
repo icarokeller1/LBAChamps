@@ -97,8 +97,10 @@
         const tblBody    = document.querySelector('#statsTable tbody');
         const syncStatus = document.getElementById('syncStatus');
         const initialPlayerCount = @Model.Players.Count;
+        const idPartidaInput = form.querySelector('input[name="IdPartida"]');
 
         let isDirty = false;
+        let autoSaveEnabled  = !!idPartidaInput.value;
 
         function markDirty() {
             if (!isDirty) {
@@ -202,7 +204,7 @@
         }
 
         setInterval(() => {
-            if (!isDirty) return;
+            if (!autoSaveEnabled || !isDirty) return;
 
             fetch('/api/partidas/autosave', {
                 method: 'POST',
@@ -233,7 +235,7 @@
                 syncStatus.classList.replace('text-success', 'text-danger');
                 console.error('Auto-save falhou', err);
             });
-        }, 60000);
+        }, 30000);
 
         if (ligaSel.value) loadTimesAndPlayers(true);
 

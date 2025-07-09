@@ -116,6 +116,7 @@ public class PartidasApiController : ControllerBase
                 Local = vm.Local
             };
             _db.Partidas.Add(partida);
+            await _db.SaveChangesAsync();
         }
 
         var casaTotal = vm.Players

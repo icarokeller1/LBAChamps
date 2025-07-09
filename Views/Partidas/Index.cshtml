@@ -1,7 +1,8 @@
 ﻿@model IEnumerable<LBAChamps.Models.Partida>
 @{
     ViewData["Title"] = "Partidas";
-    var hoje = DateTime.Today;
+    var hoje = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow,
+               TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time")).Date;
 }
 
 <h2>@ViewData["Title"]</h2>

@@ -317,6 +317,7 @@ public class PartidasController : Controller
                 PlacarFora = foraTotal
             };
             _db.Partidas.Add(partida);
+            await _db.SaveChangesAsync();
         }
 
         var estatList = vm.Players
