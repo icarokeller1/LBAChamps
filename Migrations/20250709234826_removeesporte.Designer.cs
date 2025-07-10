@@ -4,6 +4,7 @@ using LBAChamps.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LBAChamps.Migrations
 {
     [DbContext(typeof(LigaContext))]
-    partial class LigaContextModelSnapshot : ModelSnapshot
+    [Migration("20250709234826_removeesporte")]
+    partial class removeesporte
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -72,7 +75,7 @@ namespace LBAChamps.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdJogador"));
 
-                    b.Property<DateOnly?>("DataNascimento")
+                    b.Property<DateOnly>("DataNascimento")
                         .HasColumnType("date");
 
                     b.Property<int>("IdTime")

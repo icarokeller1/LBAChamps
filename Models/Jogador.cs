@@ -12,7 +12,7 @@ public class Jogador
     public string Nome { get; set; } = default!;
 
     [DataType(DataType.Date)]
-    public DateOnly DataNascimento { get; set; }
+    public DateOnly? DataNascimento { get; set; }
 
     [Required, StringLength(30)]
     public string Posicao { get; set; } = default!;

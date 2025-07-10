@@ -18,28 +18,33 @@ namespace LBAChamps.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var hoje = DateOnly.FromDateTime(DateTime.Today);
+            var vm = new DashboardVM
+            {
+                /* Status das ligas ---------------------------------------- */
+                NaoIniciadas = _context.Ligas.Count(l => l.Status == "Não Iniciada"),
+                EmAndamento = _context.Ligas.Count(l => l.Status == "Em andamento"),
+                Concluidas = _context.Ligas.Count(l => l.Status == "Concluída"),
+                Canceladas = _context.Ligas.Count(l => l.Status == "Cancelada"),
 
-            var resumo = await _context.Ligas
-                .GroupBy(l =>
-                    l.Status == "ATIVA" ? "Ativas" :
-                    l.DataInicio > hoje ? "Futuras" :
-                    l.Status == "FINALIZADA" ? "Finalizadas" :
-                                                 "Outras")
-                .Select(g => new { g.Key, Qtde = g.Count() })
-                .ToDictionaryAsync(k => k.Key, v => v.Qtde);
+                /* Totais de entidades ------------------------------------- */
+                TotalTimes = _context.Times.Count(),
+                TotalJogadores = _context.Jogadores.Count(),
+                TotalPartidas = _context.Partidas.Count(),
 
-            var vmResumo = new ResumoLigasVM(
-                resumo.GetValueOrDefault("Ativas"),
-                resumo.GetValueOrDefault("Futuras"),
-                resumo.GetValueOrDefault("Finalizadas"));
+                /* Somatório de estatísticas ------------------------------- */
+                TotalPontos = _context.EstatisticasPartidas.Sum(e => e.Pontos),
+                TotalRebotes = _context.EstatisticasPartidas.Sum(e => e.Rebotes),
+                TotalAssistencias = _context.EstatisticasPartidas.Sum(e => e.Assistencias),
+                TotalRoubosBola = _context.EstatisticasPartidas.Sum(e => e.RoubosBola),
+                TotalTocos = _context.EstatisticasPartidas.Sum(e => e.Tocos),
+                TotalFaltas = _context.EstatisticasPartidas.Sum(e => e.Faltas)
+            };
 
-            ViewBag.ResumoLigas = vmResumo;
-
-            return View();
+            return View(vm);          // envia como model fortemente tipado
         }
+
 
         public IActionResult Privacy() => View();
 

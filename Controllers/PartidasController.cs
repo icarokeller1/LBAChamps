@@ -243,7 +243,8 @@ public class PartidasController : Controller
                            .Include(j => j.Time)
                            .Where(j => j.IdTime == partida.IdTimeCasa
                                     || j.IdTime == partida.IdTimeFora)
-                           .OrderBy(j => j.Nome)
+                           .OrderBy(j => j.IdTime == partida.IdTimeCasa ? 0 : 1)
+                           .ThenBy(j => j.Nome)
                            .AsEnumerable()
                            .Select((j, i) => {
                     var est = estatList.FirstOrDefault(e => e.IdJogador == j.IdJogador);

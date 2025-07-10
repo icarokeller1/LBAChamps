@@ -21,7 +21,7 @@ public class LigasController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
-        [Bind("Nome,Descricao,DataInicio,DataFim,Esporte,Status")] Liga liga)
+        [Bind("Nome,Descricao,DataInicio,DataFim,Status")] Liga liga)
     {
         ValidarLiga(liga);
 
@@ -45,7 +45,7 @@ public class LigasController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id,
-        [Bind("IdLiga,Nome,Descricao,DataInicio,DataFim,Esporte,Status")] Liga liga)
+        [Bind("IdLiga,Nome,Descricao,DataInicio,DataFim,Status")] Liga liga)
     {
         if (id != liga.IdLiga) return NotFound();
 
@@ -103,11 +103,10 @@ public class LigasController : Controller
 
         bool existe = _context.Ligas.Any(l =>
             l.Nome == liga.Nome &&
-            l.Esporte == liga.Esporte &&
             (ignoreId == null || l.IdLiga != ignoreId));
 
         if (existe)
-            ModelState.AddModelError("Nome", "Já existe uma liga com esse Nome e Esporte.");
+            ModelState.AddModelError("Nome", "Já existe uma liga com esse Nome.");
     }
 
     private bool LigaExists(int id) =>

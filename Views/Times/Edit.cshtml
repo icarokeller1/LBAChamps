@@ -78,7 +78,14 @@
                                class="form-control form-control-sm" />
                     </td>
                     <td>
-                        <input asp-for="Players[@i].Posicao" class="form-control form-control-sm" />
+                        <select asp-for="Players[@i].Posicao" class="form-select form-select-sm" required>
+                            <option value="">-- Selecione --</option>
+                            <option>Armador</option>
+                            <option>Ala-Armador</option>
+                            <option>Ala</option>
+                            <option>Ala-Pivô</option>
+                            <option>Pivô</option>
+                        </select>
                     </td>
                     <td>
                         <input asp-for="Players[@i].NumeroCamisa"
@@ -120,8 +127,15 @@
                        type="date" class="form-control form-control-sm" />
             </td>
             <td>
-                <input name="Players[__index__].Posicao"
-                       class="form-control form-control-sm" />
+                <select name="Players[__index__].Posicao"
+                        class="form-select form-select-sm" required>
+                    <option value="">-- Selecione --</option>
+                    <option>Armador</option>
+                    <option>Ala-Armador</option>
+                    <option>Ala</option>
+                    <option>Ala-Pivô</option>
+                    <option>Pivô</option>
+                </select>
             </td>
             <td>
                 <input name="Players[__index__].NumeroCamisa"

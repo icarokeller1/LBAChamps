@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LBAChamps")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+17ae2a935080eb92d0eca98e5ab84baf07afafa3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9962445298b3ba7400c45bad59b4ac30efb4d57d")]
 [assembly: System.Reflection.AssemblyProductAttribute("LBAChamps")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LBAChamps")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

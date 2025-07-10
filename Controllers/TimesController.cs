@@ -103,7 +103,7 @@ namespace LBAChamps.Controllers
                 var jog = new Jogador
                 {
                     Nome = p.Nome!,
-                    DataNascimento = p.DataNascimento!.Value,
+                    DataNascimento = p.DataNascimento,
                     Posicao = p.Posicao!,
                     NumeroCamisa = p.NumeroCamisa!.Value,
                     IdTime = time.IdTime
@@ -214,7 +214,7 @@ namespace LBAChamps.Controllers
                             DataNascimento = p.DataNascimento,
                             Posicao = p.Posicao,
                             NumeroCamisa = p.NumeroCamisa,
-                            IdTime = vm.IdTime.Value
+                            IdTime = vm.IdTime!.Value
                         });
                     }
                 }

@@ -21,7 +21,7 @@ public class LigaContext : DbContext
     {
 
         m.Entity<Liga>()
-            .HasIndex(l => new { l.Nome, l.Esporte })
+            .HasIndex(l => new { l.Nome })
             .IsUnique();
 
 

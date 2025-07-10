@@ -12,7 +12,7 @@ namespace LBAChamps.ViewModels
         public string Nome { get; set; } = "";
 
         [DataType(DataType.Date)]
-        public DateOnly DataNascimento { get; set; }
+        public DateOnly? DataNascimento { get; set; }
 
         [Required, StringLength(30)]
         public string Posicao { get; set; } = "";

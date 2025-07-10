@@ -57,10 +57,10 @@
         {
             <tr>
                 <td>@j.Nome</td>
-                <td>@Idade(j.DataNascimento) anos</td>
+                <td>@(j.DataNascimento.HasValue ? Idade(j.DataNascimento.Value) + " anos" : "-")</td>
                 <td>@j.Posicao</td>
                 <td>@j.NumeroCamisa</td>
-                <td>@j.Time.Nome</td>
+                <td>@j.Time!.Nome</td>
                 <td class="text-end">
                     <a asp-action="Edit" asp-route-id="@j.IdJogador" class="btn btn-sm btn-primary">Editar</a>
 

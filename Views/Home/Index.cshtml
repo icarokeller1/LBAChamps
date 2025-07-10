@@ -1,39 +1,209 @@
-﻿@{
+﻿@model LBAChamps.Models.DashboardVM
+@{
     ViewData["Title"] = "Home Page";
 }
 
-@{
-    var resumo = (LBAChamps.Models.ResumoLigasVM)ViewBag.ResumoLigas;
-}
+<!-- ▸  Estilo local  ----------------------------------------------------- -->
+<style>
+    /* link que ocupa todo o card e mantém a cor original */
+    .dashboard-link {
+        display: block;
+        color: inherit;
+        text-decoration: none;
+    }
 
+        /* animação / realce */
+        .dashboard-link .card {
+            transition: transform .15s ease, box-shadow .15s ease;
+        }
+
+        .dashboard-link:hover .card,
+        .dashboard-link:focus .card {
+            transform: translateY(-4px);
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+        }
+</style>
+
+<!-- ▸  1ª linha – Status das ligas  ------------------------------------- -->
 <div class="row g-4 mb-4 text-center">
-    <div class="col-md-4">
-        <div class="card shadow-sm border-success">
-            <div class="card-body">
-                <i class="bi bi-play-circle fs-1 text-success"></i>
-                <h5 class="card-title mt-2">Ligas Ativas</h5>
-                <p class="display-6">@resumo.Ativas</p>
+
+    @* Não iniciadas *@
+    <div class="col-md-3">
+        <a asp-controller="Ligas"
+           asp-action="Index"
+           asp-route-status="Não Iniciada"
+           class="dashboard-link">
+            <div class="card shadow-sm border-info">
+                <div class="card-body">
+                    <i class="bi bi-hourglass-top fs-1 text-info"></i>
+                    <h5 class="card-title mt-2">Não iniciadas</h5>
+                    <p class="display-6">@Model.NaoIniciadas</p>
+                </div>
             </div>
-        </div>
+        </a>
+    </div>
+
+    @* Em andamento *@
+    <div class="col-md-3">
+        <a asp-controller="Ligas"
+           asp-action="Index"
+           asp-route-status="Em andamento"
+           class="dashboard-link">
+            <div class="card shadow-sm border-success">
+                <div class="card-body">
+                    <i class="bi bi-play-circle fs-1 text-success"></i>
+                    <h5 class="card-title mt-2">Em andamento</h5>
+                    <p class="display-6">@Model.EmAndamento</p>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    @* Concluídas *@
+    <div class="col-md-3">
+        <a asp-controller="Ligas"
+           asp-action="Index"
+           asp-route-status="Concluída"
+           class="dashboard-link">
+            <div class="card shadow-sm border-secondary">
+                <div class="card-body">
+                    <i class="bi bi-flag fs-1 text-secondary"></i>
+                    <h5 class="card-title mt-2">Concluídas</h5>
+                    <p class="display-6">@Model.Concluidas</p>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    @* Canceladas *@
+    <div class="col-md-3">
+        <a asp-controller="Ligas"
+           asp-action="Index"
+           asp-route-status="Cancelada"
+           class="dashboard-link">
+            <div class="card shadow-sm border-danger">
+                <div class="card-body">
+                    <i class="bi bi-x-circle fs-1 text-danger"></i>
+                    <h5 class="card-title mt-2">Canceladas</h5>
+                    <p class="display-6">@Model.Canceladas</p>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- ▸  2ª linha – Totais de entidades  ---------------------------------- -->
+<div class="row g-4 mb-4 text-center">
+
+    <div class="col-md-4">
+        <a asp-controller="Times" asp-action="Index" class="dashboard-link">
+            <div class="card shadow-sm border-primary">
+                <div class="card-body">
+                    <i class="bi bi-people fs-1 text-primary"></i>
+                    <h5 class="card-title mt-2">Times</h5>
+                    <p class="display-6">@Model.TotalTimes</p>
+                </div>
+            </div>
+        </a>
     </div>
 
     <div class="col-md-4">
-        <div class="card shadow-sm border-info">
-            <div class="card-body">
-                <i class="bi bi-hourglass-split fs-1 text-info"></i>
-                <h5 class="card-title mt-2">Futuras</h5>
-                <p class="display-6">@resumo.Futuras</p>
+        <a asp-controller="Jogadores" asp-action="Index" class="dashboard-link">
+            <div class="card shadow-sm border-primary">
+                <div class="card-body">
+                    <i class="bi bi-person fs-1 text-primary"></i>
+                    <h5 class="card-title mt-2">Jogadores</h5>
+                    <p class="display-6">@Model.TotalJogadores</p>
+                </div>
             </div>
-        </div>
+        </a>
     </div>
 
     <div class="col-md-4">
-        <div class="card shadow-sm border-secondary">
-            <div class="card-body">
-                <i class="bi bi-flag fs-1 text-secondary"></i>
-                <h5 class="card-title mt-2">Finalizadas</h5>
-                <p class="display-6">@resumo.Finalizadas</p>
+        <a asp-controller="Partidas" asp-action="Index" class="dashboard-link">
+            <div class="card shadow-sm border-primary">
+                <div class="card-body">
+                    <i class="bi bi-trophy fs-1 text-primary"></i>
+                    <h5 class="card-title mt-2">Partidas</h5>
+                    <p class="display-6">@Model.TotalPartidas</p>
+                </div>
             </div>
-        </div>
+        </a>
+    </div>
+</div>
+
+<!-- ▸  3ª linha – Acumulado de estatísticas  ----------------------------- -->
+<div class="row g-4 text-center">
+
+    <div class="col-md-2">
+        <a asp-controller="EstatisticasPartidas" asp-action="Index" class="dashboard-link">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <i class="bi bi-123 fs-2"></i>
+                    <small class="d-block">Pontos</small>
+                    <span class="fw-bold">@Model.TotalPontos</span>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-2">
+        <a asp-controller="EstatisticasPartidas" asp-action="Index" class="dashboard-link">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <i class="bi bi-basket fs-2"></i>
+                    <small class="d-block">Rebotes</small>
+                    <span class="fw-bold">@Model.TotalRebotes</span>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-2">
+        <a asp-controller="EstatisticasPartidas" asp-action="Index" class="dashboard-link">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <i class="bi bi-hand-index-thumb fs-2"></i>
+                    <small class="d-block">Assistências</small>
+                    <span class="fw-bold">@Model.TotalAssistencias</span>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-2">
+        <a asp-controller="EstatisticasPartidas" asp-action="Index" class="dashboard-link">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <i class="bi bi-shield-check fs-2"></i>
+                    <small class="d-block">Roubos</small>
+                    <span class="fw-bold">@Model.TotalRoubosBola</span>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-2">
+        <a asp-controller="EstatisticasPartidas" asp-action="Index" class="dashboard-link">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <i class="bi bi-arrow-up fs-2"></i>
+                    <small class="d-block">Tocos</small>
+                    <span class="fw-bold">@Model.TotalTocos</span>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-2">
+        <a asp-controller="EstatisticasPartidas" asp-action="Index" class="dashboard-link">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <i class="bi bi-exclamation-circle fs-2"></i>
+                    <small class="d-block">Faltas</small>
+                    <span class="fw-bold">@Model.TotalFaltas</span>
+                </div>
+            </div>
+        </a>
     </div>
 </div>

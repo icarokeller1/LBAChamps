@@ -35,7 +35,14 @@
 
     <div class="col-md-4">
         <label asp-for="Posicao" class="form-label"></label>
-        <input asp-for="Posicao" class="form-control" maxlength="30" required />
+        <select asp-for="Posicao" class="form-select" required>
+            <option value="">-- Selecione --</option>
+            <option>Armador</option>
+            <option>Ala-Armador</option>
+            <option>Ala</option>
+            <option>Ala-Pivô</option>
+            <option>Pivô</option>
+        </select>
         <div class="invalid-feedback">Posição obrigatória.</div>
     </div>
 

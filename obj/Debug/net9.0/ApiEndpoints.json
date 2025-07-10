@@ -154,11 +154,6 @@
         "Name": "status",
         "Type": "System.String",
         "IsRequired": false
-      },
-      {
-        "Name": "esporte",
-        "Type": "System.String",
-        "IsRequired": false
       }
     ],
     "ReturnTypes": [

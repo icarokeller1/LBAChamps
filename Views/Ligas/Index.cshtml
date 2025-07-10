@@ -23,7 +23,6 @@
     <thead class="table-dark">
         <tr>
             <th>@Html.DisplayNameFor(m => m.First().Nome)</th>
-            <th>@Html.DisplayNameFor(m => m.First().Esporte)</th>
             <th class="text-center">@Html.DisplayNameFor(m => m.First().Status)</th>
             <th>@Html.DisplayNameFor(m => m.First().DataInicio)</th>
             <th class="text-end">Ações</th>
@@ -34,7 +33,6 @@
         {
             <tr>
                 <td>@item.Nome</td>
-                <td>@item.Esporte</td>
                 <td class="text-center">@item.Status</td>
                 <td>@item.DataInicio.ToString("d")</td>
                 <td class="text-end">

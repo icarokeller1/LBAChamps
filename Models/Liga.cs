@@ -20,9 +20,6 @@ public class Liga
     [DataType(DataType.Date)]
     public DateOnly? DataFim { get; set; }
 
-    [Required, StringLength(60)]
-    public string Esporte { get; set; } = default!;
-
     [Required, StringLength(30)]
     public string Status { get; set; } = default!;
 

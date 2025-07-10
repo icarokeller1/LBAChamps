@@ -1,59 +1,90 @@
 @model LBAChamps.Models.Liga
-
 @{
     ViewData["Title"] = "Editar Liga";
 }
 
-<h1>Edit</h1>
+<h2 class="mb-4">Editar liga</h2>
 
-<h4>Liga</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="IdLiga" />
-            <div class="form-group">
-                <label asp-for="Nome" class="control-label"></label>
-                <input asp-for="Nome" class="form-control" />
-                <span asp-validation-for="Nome" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Descricao" class="control-label"></label>
-                <input asp-for="Descricao" class="form-control" />
-                <span asp-validation-for="Descricao" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DataInicio" class="control-label"></label>
-                <input asp-for="DataInicio" class="form-control" />
-                <span asp-validation-for="DataInicio" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DataFim" class="control-label"></label>
-                <input asp-for="DataFim" class="form-control" />
-                <span asp-validation-for="DataFim" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Esporte" class="control-label"></label>
-                <input asp-for="Esporte" class="form-control" />
-                <span asp-validation-for="Esporte" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Status" class="form-label"></label>
-                <input asp-for="Status" class="form-control" />
-                <span asp-validation-for="Status" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+<form asp-action="Edit" class="row g-3">
+    <input type="hidden" asp-for="IdLiga" />
+
+    <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+    <div class="col-md-6">
+        <label asp-for="Nome" class="form-label"></label>
+        <input asp-for="Nome" class="form-control" />
+        <span asp-validation-for="Nome" class="text-danger"></span>
     </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+    <div class="col-md-6">
+        <label asp-for="Descricao" class="form-label"></label>
+        <input asp-for="Descricao" class="form-control" />
+        <span asp-validation-for="Descricao" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="DataInicio" class="form-label"></label>
+        <input asp-for="DataInicio" type="date" class="form-control" />
+        <span asp-validation-for="DataInicio" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="DataFim" class="form-label"></label>
+        <input asp-for="DataFim" type="date" class="form-control" />
+        <span asp-validation-for="DataFim" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="Status" class="form-label"></label>
+        <select asp-for="Status" class="form-select">
+            <option value="">-- Selecione --</option>
+            <option>Não Iniciada</option>
+            <option>Em andamento</option>
+            <option>Concluída</option>
+            <option>Cancelada</option>
+        </select>
+        <span asp-validation-for="Status" class="text-danger"></span>
+    </div>
+
+    <div class="col-12 mt-3">
+        <button type="submit" class="btn btn-primary">Salvar</button>
+        <a asp-action="Index" class="btn btn-outline-secondary ms-2">Cancelar</a>
+    </div>
+</form>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        (() => {
+            const status  = document.getElementById('Status');
+            const dataFim = document.getElementById('DataFim');
+            const form    = status.form;
+            const hojeISO = new Date().toISOString().split('T')[0];
+
+            function aplicarRegra() {
+                const concluida = status.value.toLowerCase() === 'concluída' ||
+                                   status.value.toLowerCase() === 'concluida';
+
+                if (concluida) {
+                    dataFim.required = true;
+                    dataFim.max = hojeISO;
+                } else {
+                    dataFim.required = false;
+                    dataFim.removeAttribute('max');
+                }
+            }
+
+            status.addEventListener('change', aplicarRegra);
+            aplicarRegra();
+
+            form.addEventListener('submit', e => {
+                if (!form.checkValidity()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            });
+        })();
+    </script>
 }
